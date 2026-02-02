@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SkillConnect — Login / Signup / Find Skilled People</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<!-- EMAILJS -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+  (function(){
+    emailjs.init("PpXJtmBS2cd6k1qfT");
+  })();
+</script>
+
+<style>
+* {margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
+body{min-height:100vh;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);display:flex;align-items:center;justify-content:center;color:#fff;position:relative;}
+.container{width:95%;max-width:420px;background:rgba(255,255,255,0.08);backdrop-filter:blur(20px);border-radius:20px;padding:30px;box-shadow:0 25px 60px rgba(0,0,0,0.4);animation:fadeIn 1s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+h1{text-align:center;font-weight:700;margin-bottom:10px;}
+p{text-align:center;font-size:14px;opacity:0.85;margin-bottom:25px;}
+input,select,button{width:100%;padding:14px;margin-bottom:15px;border-radius:12px;border:none;outline:none;font-size:14px;}
+input,select{background:rgba(255,255,255,0.15);color:#fff;}
+select option{color:#000;}
+button{background:linear-gradient(135deg,#00c6ff,#0072ff);color:#fff;font-weight:600;cursor:pointer;transition:0.3s ease;}
+button:hover{transform:scale(1.03);}
+.tabs{display:flex;justify-content:space-around;margin-bottom:20px;}
+.tab{padding:10px 20px;cursor:pointer;border-radius:12px;transition:0.3s ease;}
+.tab.active{background:linear-gradient(135deg,#00c6ff,#0072ff);font-weight:700;}
+.form-section{display:none;flex-direction:column;}
+.form-section.active{display:flex;}
+.error{color:#ff4b5c;font-size:12px;margin-bottom:10px;}
+.locate-btn{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);font-size:13px;}
+.result{display:none;margin-top:20px;background:rgba(0,0,0,0.4);padding:15px;border-radius:12px;text-align:center;}
+.locked{opacity:0.5;}
+.unlock{margin-top:15px;background:linear-gradient(135deg,#f7971e,#ffd200);color:#000;}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;}
+.modal-content{background:#111;padding:25px;border-radius:18px;width:90%;max-width:350px;text-align:center;}
+.pay-btn{background:linear-gradient(135deg,#00ff99,#00cc66);color:#000;}
+.close{margin-top:10px;background:transparent;border:1px solid #555;}
+#skill-section{display:none;}
+#logout-container{position:absolute;top:20px;left:20px;width:auto;}
+#logout-btn{padding:10px 20px;background:linear-gradient(135deg,#ff4b5c,#ff1e00);border-radius:12px;font-weight:600;cursor:pointer;}
+#forgot-email-container,#reset-password-container{display:none;flex-direction:column;}
+</style>
+</head>
+<body>
+
+<div id="logout-container" style="display:none;">
+  <button id="logout-btn" onclick="logoutUser()">Logout</button>
+</div>
+
+<div class="container" id="auth-container">
+  <h1>Welcome to SkillConnect</h1>
+  <p>Sign up or log in to find skilled people near you</p>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('login')">Login</div>
+    <div class="tab" onclick="switchTab('signup')">Signup</div>
+  </div>
+
+  <div class="form-section active" id="login">
+    <div class="error" id="login-error"></div>
+    <input type="email" id="login-email" placeholder="Email" required />
+    <input type="password" id="login-password" placeholder="Password" required />
+    <button onclick="loginUser()">Login</button>
+
+    <button style="background:linear-gradient(135deg,#ffa500,#ff6600);" onclick="showForgotEmail()">Forgot Password?</button>
+
+    <div id="forgot-email-container">
+      <input type="email" id="forgot-email" placeholder="Enter your email to reset password" />
+      <button style="background:linear-gradient(135deg,#ff99cc,#ff3399);" onclick="sendResetLink()">Send Reset Link</button>
+    </div>
+
+    <div id="reset-password-container">
+      <input type="text" id="reset-code" placeholder="Enter code received" />
+      <input type="password" id="new-password" placeholder="New Password" />
+      <input type="password" id="confirm-new-password" placeholder="Confirm Password" />
+      <button style="background:linear-gradient(135deg,#33ccff,#0066ff);" onclick="completeReset()">Reset Password</button>
+    </div>
+  </div>
+
+  <div class="form-section" id="signup">
+    <div class="error" id="signup-error"></div>
+    <input type="text" id="signup-name" placeholder="Full Name" />
+    <input type="email" id="signup-email" placeholder="Email" />
+    <input type="password" id="signup-password" placeholder="Password" />
+    <input type="password" id="signup-confirm-password" placeholder="Confirm Password" />
+    <button onclick="signupUser()">Signup</button>
+  </div>
+</div>
+
+<script>
+let users = JSON.parse(localStorage.getItem('users')) || [];
+let generatedCode = null;
+
+/* FORGOT PASSWORD */
+function showForgotEmail(){
+  document.getElementById('forgot-email-container').style.display='flex';
+}
+
+function sendResetLink(){
+  const email = document.getElementById('forgot-email').value.trim();
+  if(!/\S+@\S+\.\S+/.test(email)){ alert("Invalid email"); return; }
+
+  const user = users.find(u => u.email === email);
+  if(!user){ alert("Email not registered"); return; }
+
+  generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+  emailjs.send("service_5847wy6", "template_d67hhwh", {
+    to_email: email,
+    reset_code: generatedCode
+  }).then(() => {
+    alert("Reset code sent to your email");
+    document.getElementById('forgot-email-container').style.display='none';
+    document.getElementById('reset-password-container').style.display='flex';
+  }).catch(err => {
+    alert("Failed to send reset email");
+    console.error(err);
+  });
+}
+
+function completeReset(){
+  const code=document.getElementById('reset-code').value.trim();
+  const pass=document.getElementById('new-password').value.trim();
+  const confirm=document.getElementById('confirm-new-password').value.trim();
+
+  if(code!==generatedCode){alert("Invalid code");return;}
+  if(pass.length<6){alert("Password too short");return;}
+  if(pass!==confirm){alert("Passwords do not match");return;}
+
+  const email=document.getElementById('forgot-email').value.trim();
+  const user=users.find(u=>u.email===email);
+  user.password=pass;
+  localStorage.setItem('users',JSON.stringify(users));
+  alert("Password reset successful");
+  document.getElementById('reset-password-container').style.display='none';
+}
+</script>
+
+</body>
+</html>
