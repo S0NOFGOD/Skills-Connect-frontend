@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SkillConnect — Login / Signup</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+}
+.container{
+  width:95%;
+  max-width:420px;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(20px);
+  border-radius:20px;
+  padding:30px;
+}
+h1{text-align:center;margin-bottom:10px;}
+p{text-align:center;font-size:14px;margin-bottom:20px;}
+input,select,button{
+  width:100%;
+  padding:14px;
+  margin-bottom:15px;
+  border-radius:12px;
+  border:none;
+}
+input,select{background:rgba(255,255,255,0.15);color:#fff;}
+button{
+  background:linear-gradient(135deg,#00c6ff,#0072ff);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+}
+.tabs{display:flex;justify-content:space-around;margin-bottom:20px;}
+.tab{padding:10px 20px;border-radius:12px;cursor:pointer;}
+.tab.active{background:linear-gradient(135deg,#00c6ff,#0072ff);}
+.form-section{display:none;}
+.form-section.active{display:block;}
+.error{color:#ff4b5c;font-size:12px;margin-bottom:10px;}
+.locate-btn{background:rgba(255,255,255,0.15);}
+#skill-section{display:none;}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div class="container" id="auth-container">
+  <h1>SkillConnect</h1>
+  <p>Login or Signup to continue</p>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('login', this)">Login</div>
+    <div class="tab" onclick="switchTab('signup', this)">Signup</div>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="form-section active" id="login">
+    <div class="error" id="login-error"></div>
+    <input id="login-email" type="email" placeholder="Email">
+    <input id="login-password" type="password" placeholder="Password">
+    <button onclick="loginUser()">Login</button>
+  </div>
+
+  <!-- SIGNUP -->
+  <div class="form-section" id="signup">
+    <div class="error" id="signup-error"></div>
+    <input id="signup-name" type="text" placeholder="Full Name">
+    <input id="signup-email" type="email" placeholder="Email">
+    <input id="signup-password" type="password" placeholder="Password">
+    <input id="signup-confirm" type="password" placeholder="Confirm Password">
+    <button onclick="signupUser()">Signup</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="container" id="skill-section">
+  <h1 id="welcome-text">Welcome</h1>
+
+  <select id="skill">
+    <option value="">Select a skill</option>
+    <option>Barber</option>
+    <option>Electrician</option>
+    <option>Plumber</option>
+  </select>
+
+  <button class="locate-btn" onclick="useLocation()">📍 Use My Current Location</button>
+  <input id="location" type="text" placeholder="Enter your area">
+
+  <button>Find Skilled Person</button>
+  <button onclick="logoutUser()">Logout</button>
+</div>
+
+<script>
+const BACKEND_URL = "https://skillconnect-backend-uv3z.onrender.com";
+let currentUser = null;
+
+/* TAB SWITCH */
+function switchTab(tab, el){
+  document.querySelectorAll('.form-section').forEach(f=>f.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  el.classList.add('active');
+}
+
+/* SIGNUP */
+async function signupUser(){
+  const name = document.getElementById("signup-name").value;
+  const email = document.getElementById("signup-email").value;
+  const password = document.getElementById("signup-password").value;
+  const confirm = document.getElementById("signup-confirm").value;
+  const error = document.getElementById("signup-error");
+
+  error.innerText = "";
+
+  if(password !== confirm){
+    error.innerText = "Passwords do not match";
+    return;
+  }
+
+  try{
+    const res = await fetch(`${BACKEND_URL}/signup`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({name,email,password})
+    });
+
+    const data = await res.json();
+    if(!res.ok){ error.innerText = data.message; return; }
+
+    currentUser = data.user;
+    showDashboard();
+  }catch{
+    error.innerText = "Server not reachable";
+  }
+}
+
+/* LOGIN */
+async function loginUser(){
+  const email = document.getElementById("login-email").value;
+  const password = document.getElementById("login-password").value;
+  const error = document.getElementById("login-error");
+
+  error.innerText = "";
+
+  try{
+    const res = await fetch(`${BACKEND_URL}/login`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({email,password})
+    });
+
+    const data = await res.json();
+    if(!res.ok){ error.innerText = data.message; return; }
+
+    currentUser = data.user;
+    showDashboard();
+  }catch{
+    error.innerText = "Server not reachable";
+  }
+}
+
+/* DASHBOARD */
+function showDashboard(){
+  document.getElementById("auth-container").style.display="none";
+  document.getElementById("skill-section").style.display="block";
+  document.getElementById("welcome-text").innerText =
+    "Welcome " + currentUser.name.split(" ")[0];
+}
+
+/* LOGOUT */
+function logoutUser(){
+  location.reload();
+}
+
+/* LOCATION */
+function useLocation(){
+  const input = document.getElementById("location");
+  input.value = "Loading. Hold on...";
+
+  if(!navigator.geolocation){
+    input.value = "Location not supported";
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    try{
+      const {latitude, longitude} = pos.coords;
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`,
+        { headers:{ "User-Agent":"SkillConnect/1.0" } }
+      );
+      const data = await res.json();
+
+      const city =
+        data.address.city ||
+        data.address.town ||
+        data.address.village ||
+        "";
+      const state = data.address.state || "";
+
+      input.value = city && state ? `${city}, ${state}` : "Location found";
+    }catch{
+      input.value = "Could not fetch location";
+    }
+  },()=>{
+    input.value = "Permission denied";
+  });
+}
+</script>
+
+</body>
+  </html>
