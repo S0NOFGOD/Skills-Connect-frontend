@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SkillConnect — Login / Signup</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
+body{min-height:100vh;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);display:flex;align-items:center;justify-content:center;color:#fff;}
+.container{width:95%;max-width:420px;background:rgba(255,255,255,.08);backdrop-filter:blur(20px);border-radius:20px;padding:30px;}
+h1{text-align:center;margin-bottom:10px}
+p{text-align:center;font-size:14px;margin-bottom:25px;opacity:.8}
+input,button{width:100%;padding:14px;margin-bottom:15px;border-radius:12px;border:none}
+input{background:rgba(255,255,255,.15);color:#fff}
+button{background:linear-gradient(135deg,#00c6ff,#0072ff);color:#fff;font-weight:600;cursor:pointer}
+.tabs{display:flex;justify-content:space-around;margin-bottom:20px}
+.tab{padding:10px 20px;cursor:pointer;border-radius:12px}
+.tab.active{background:linear-gradient(135deg,#00c6ff,#0072ff)}
+.form-section{display:none}
+.form-section.active{display:block}
+.error{color:#ff4b5c;font-size:12px;margin-bottom:10px}
+#skill-section{display:none}
+#logout-container{position:absolute;top:20px;left:20px;display:none}
+</style>
+</head>
+<body>
+
+<div id="logout-container">
+  <button type="button" onclick="logoutUser()">Logout</button>
+</div>
+
+<div class="container" id="auth-container">
+<h1>Welcome to SkillConnect</h1>
+<p>Sign up or log in</p>
+
+<div class="tabs">
+  <div class="tab active" id="login-tab">Login</div>
+  <div class="tab" id="signup-tab">Signup</div>
+</div>
+
+<!-- LOGIN -->
+<div class="form-section active" id="login">
+  <div class="error" id="login-error"></div>
+  <input id="login-email" placeholder="Email">
+  <input type="password" id="login-password" placeholder="Password">
+  <button type="button" id="login-btn">Login</button>
+  <button type="button" id="forgot-btn">Forgot Password?</button>
+
+  <div id="forgot-email-container" style="display:none">
+    <input id="forgot-email" placeholder="Your email">
+    <button type="button" id="send-reset-btn">Send Reset Code</button>
+  </div>
+
+  <div id="reset-password-container" style="display:none">
+    <input id="reset-code" placeholder="Reset Code">
+    <input type="password" id="new-password" placeholder="New Password">
+    <input type="password" id="confirm-new-password" placeholder="Confirm Password">
+    <button type="button" id="reset-password-btn">Reset Password</button>
+  </div>
+</div>
+
+<!-- SIGNUP -->
+<div class="form-section" id="signup">
+  <div class="error" id="signup-error"></div>
+  <input id="signup-name" placeholder="Full Name">
+  <input id="signup-email" placeholder="Email">
+  <input type="password" id="signup-password" placeholder="Password">
+  <input type="password" id="signup-confirm-password" placeholder="Confirm Password">
+  <button type="button" id="signup-btn">Signup</button>
+</div>
+</div>
+
+<div class="container" id="skill-section">
+  <h1 id="welcome-text"></h1>
+</div>
+
+<script>
+const BACKEND_URL = "https://skillconnect-backend-uv3z.onrender.com";
+let currentUser = null;
+
+// TAB SWITCH
+document.getElementById("login-tab").onclick = () => switchTab("login");
+document.getElementById("signup-tab").onclick = () => switchTab("signup");
+
+function switchTab(tab){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".form-section").forEach(f=>f.classList.remove("active"));
+  document.getElementById(tab).classList.add("active");
+  document.getElementById(tab+"-tab").classList.add("active");
+}
+
+// LOGIN
+document.getElementById("login-btn").onclick = async () => {
+  const email = document.getElementById("login-email").value;
+  const password = document.getElementById("login-password").value;
+
+  const res = await fetch(`${BACKEND_URL}/login`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({email,password})
+  });
+
+  const data = await res.json();
+  if(!res.ok){
+    document.getElementById("login-error").innerText = data.message;
+    return;
+  }
+
+  currentUser = data.user;
+  showSkill();
+};
+
+// SIGNUP
+document.getElementById("signup-btn").onclick = async () => {
+  const name = document.getElementById("signup-name").value;
+  const email = document.getElementById("signup-email").value;
+  const password = document.getElementById("signup-password").value;
+  const confirm = document.getElementById("signup-confirm-password").value;
+
+  if(password !== confirm){
+    document.getElementById("signup-error").innerText = "Passwords do not match";
+    return;
+  }
+
+  const res = await fetch(`${BACKEND_URL}/signup`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({name,email,password})
+  });
+
+  const data = await res.json();
+  if(!res.ok){
+    document.getElementById("signup-error").innerText = data.message;
+    return;
+  }
+
+  currentUser = data.user;
+  showSkill();
+};
+
+// FORGOT PASSWORD
+document.getElementById("forgot-btn").onclick = () => {
+  document.getElementById("forgot-email-container").style.display = "block";
+};
+
+document.getElementById("send-reset-btn").onclick = async () => {
+  await fetch(`${BACKEND_URL}/forgot-password`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ email: document.getElementById("forgot-email").value })
+  });
+  document.getElementById("reset-password-container").style.display = "block";
+};
+
+document.getElementById("reset-password-btn").onclick = async () => {
+  const newPass = document.getElementById("new-password").value;
+  const confirmPass = document.getElementById("confirm-new-password").value;
+
+  if(newPass !== confirmPass){
+    alert("Passwords do not match");
+    return;
+  }
+
+  await fetch(`${BACKEND_URL}/reset-password`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      email: document.getElementById("forgot-email").value,
+      code: document.getElementById("reset-code").value,
+      newPassword: newPass
+    })
+  });
+
+  alert("Password reset successful");
+};
+
+// AFTER LOGIN
+function showSkill(){
+  document.getElementById("auth-container").style.display = "none";
+  document.getElementById("skill-section").style.display = "block";
+  document.getElementById("logout-container").style.display = "block";
+  document.getElementById("welcome-text").innerText =
+    "Welcome " + currentUser.name.split(" ")[0];
+}
+
+function logoutUser(){
+  location.reload();
+}
+</script>
+
+</body>
+  </html>
