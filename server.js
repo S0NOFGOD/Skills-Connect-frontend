@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SkillConnect — Login / Signup / Find Skilled People</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
+body{min-height:100vh;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);display:flex;align-items:center;justify-content:center;color:#fff;position:relative;}
+.container{width:95%;max-width:420px;background:rgba(255,255,255,0.08);backdrop-filter:blur(20px);border-radius:20px;padding:30px;box-shadow:0 25px 60px rgba(0,0,0,0.4);animation:fadeIn 1s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+h1{text-align:center;font-weight:700;margin-bottom:10px;}
+p{text-align:center;font-size:14px;opacity:0.85;margin-bottom:25px;}
+input,select,button{width:100%;padding:14px;margin-bottom:15px;border-radius:12px;border:none;outline:none;font-size:14px;}
+input,select{background:rgba(255,255,255,0.15);color:#fff;}
+select option{color:#000;}
+button{background:linear-gradient(135deg,#00c6ff,#0072ff);color:#fff;font-weight:600;cursor:pointer;transition:0.3s ease;}
+button:hover{transform:scale(1.03);}
+.tabs{display:flex;justify-content:space-around;margin-bottom:20px;}
+.tab{padding:10px 20px;cursor:pointer;border-radius:12px;transition:0.3s ease;}
+.tab.active{background:linear-gradient(135deg,#00c6ff,#0072ff);font-weight:700;}
+.form-section{display:none;flex-direction:column;}
+.form-section.active{display:flex;}
+.error{color:#ff4b5c;font-size:12px;margin-bottom:10px;}
+.locate-btn{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);font-size:13px;}
+.result{display:none;margin-top:20px;background:rgba(0,0,0,0.4);padding:15px;border-radius:12px;text-align:center;}
+.locked{opacity:0.5;}
+.unlock{margin-top:15px;background:linear-gradient(135deg,#f7971e,#ffd200);color:#000;}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;}
+.modal-content{background:#111;padding:25px;border-radius:18px;width:90%;max-width:350px;text-align:center;}
+.pay-btn{background:linear-gradient(135deg,#00ff99,#00cc66);color:#000;}
+.close{margin-top:10px;background:transparent;border:1px solid #555;}
+#skill-section{display:none;}
+#logout-container{position:absolute;top:20px;left:20px;width:auto;}
+#logout-btn{padding:10px 20px;background:linear-gradient(135deg,#ff4b5c,#ff1e00);border-radius:12px;font-weight:600;cursor:pointer;}
+#forgot-email-container,#reset-password-container{display:none;flex-direction:column;}
+.password-wrapper{position:relative;width:100%;}
+.password-wrapper input{padding-right:40px;}
+.password-wrapper .toggle-password{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#fff;opacity:0.7;user-select:none;}
+.password-wrapper .toggle-password:hover{opacity:1;}
+</style>
+</head>
+<body>
+
+<div id="logout-container" style="display:none;">
+  <button id="logout-btn">Logout</button>
+</div>
+
+<div class="container" id="auth-container">
+  <h1>Welcome to SkillConnect</h1>
+  <p>Sign up or log in to find skilled people near you</p>
+
+  <div class="tabs">
+    <div class="tab active" id="login-tab">Login</div>
+    <div class="tab" id="signup-tab">Signup</div>
+  </div>
+
+  <div class="form-section active" id="login">
+    <div class="error" id="login-error"></div>
+    <input type="email" id="login-email" placeholder="Email" required />
+
+    <div class="password-wrapper">
+      <input type="password" id="login-password" placeholder="Password" required />
+      <span class="toggle-password" data-target="login-password">👁️</span>
+    </div>
+
+    <button id="login-btn">Login</button>
+    <button style="background:linear-gradient(135deg,#ffa500,#ff6600);margin-bottom:10px;" id="forgot-btn">Forgot Password?</button>
+
+    <div id="forgot-email-container">
+      <input type="email" id="forgot-email" placeholder="Enter your email to reset password" />
+      <button style="background:linear-gradient(135deg,#ff99cc,#ff3399);" id="send-reset-btn">Send Reset Link</button>
+    </div>
+
+    <div id="reset-password-container">
+      <input type="text" id="reset-code" placeholder="Enter code received" />
+
+      <div class="password-wrapper">
+        <input type="password" id="new-password" placeholder="New Password" />
+        <span class="toggle-password" data-target="new-password">👁️</span>
+      </div>
+
+      <div class="password-wrapper">
+        <input type="password" id="confirm-new-password" placeholder="Confirm Password" />
+        <span class="toggle-password" data-target="confirm-new-password">👁️</span>
+      </div>
+
+      <button style="background:linear-gradient(135deg,#33ccff,#0066ff);" id="reset-password-btn">Reset Password</button>
+    </div>
+  </div>
+
+  <div class="form-section" id="signup">
+    <div class="error" id="signup-error"></div>
+    <input type="text" id="signup-name" placeholder="Full Name" required />
+    <input type="email" id="signup-email" placeholder="Email" required />
+
+    <div class="password-wrapper">
+      <input type="password" id="signup-password" placeholder="Password" required />
+      <span class="toggle-password" data-target="signup-password">👁️</span>
+    </div>
+
+    <div class="password-wrapper">
+      <input type="password" id="signup-confirm-password" placeholder="Confirm Password" required />
+      <span class="toggle-password" data-target="signup-confirm-password">👁️</span>
+    </div>
+
+    <button id="signup-btn">Signup</button>
+  </div>
+</div>
+
+<div class="container" id="skill-section">
+  <h1 id="welcome-text">SkillConnect</h1>
+  <p>Find trusted skilled people near you</p>
+
+  <select id="skill">
+    <option value="">Select a skill</option>
+    <option>Barber</option>
+    <option>Phone Repairer</option>
+    <option>Electrician</option>
+    <option>Plumber</option>
+    <option>Web Developer</option>
+    <option>Cleaner</option>
+  </select>
+
+  <button class="locate-btn" id="locate-btn">📍 Use My Current Location</button>
+  <input type="text" id="location" placeholder="Enter your area (e.g. Yaba)" />
+
+  <button id="find-skill-btn">Find Skilled Person</button>
+
+  <div class="result" id="result">
+    <h3>Skilled Person Found</h3>
+    <p class="locked" id="info">
+      Name: ****<br>
+      Phone: ****
+    </p>
+    <button class="unlock" id="unlock-btn">Unlock Contact (₦500)</button>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h2>Unlock Contact</h2>
+    <p>Pay ₦500 to access contact details.</p>
+    <button class="pay-btn" id="pay-btn">Pay & Unlock</button>
+    <button class="close" id="close-modal-btn">Cancel</button>
+  </div>
+</div>
+
+<script>
+const BACKEND_URL = "https://skillconnect-backend-uv3z.onrender.com";
+let currentUser = null;
+
+// PASSWORD TOGGLE
+document.addEventListener('click', function(e){
+  if(e.target.classList.contains('toggle-password')){
+    const input = document.getElementById(e.target.dataset.target);
+    input.type = input.type==='password'?'text':'password';
+  }
+});
+
+// TAB SWITCH
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.form-section').forEach(f=>f.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  document.getElementById(tab+'-tab').classList.add('active');
+  document.getElementById('forgot-email-container').style.display='none';
+  document.getElementById('reset-password-container').style.display='none';
+}
+
+// SIGNUP
+async function signupUser() {
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value.trim();
+  const confirmPassword = document.getElementById('signup-confirm-password').value.trim();
+  const error = document.getElementById('signup-error'); error.innerText='';
+
+  if(!name||!email||!password||!confirmPassword){error.innerText="All fields required!";return;}
+  if(password!==confirmPassword){error.innerText="Passwords do not match!";return;}
+
+  try {
+    const res = await fetch(`${BACKEND_URL}/signup`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({name,email,password})
+    });
+    const data = await res.json();
+    if(res.ok){
+      currentUser = data.user;
+      localStorage.setItem('token', data.token);
+      showSkillSection();
+    } else { error.innerText = data.message; }
+  } catch(err){ error.innerText="Signup failed!"; }
+}
+
+// LOGIN
+async function loginUser(){
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+  const error = document.getElementById('login-error'); error.innerText='';
+
+  try {
+    const res = await fetch(`${BACKEND_URL}/login`, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({email,password})
+    });
+    const data = await res.json();
+    if(res.ok){
+      currentUser = data.user;
+      localStorage.setItem('token', data.token); // store JWT token
+      showSkillSection();
+    }
+    else { error.innerText = data.message; }
+  } catch(err){ error.innerText="Login failed!"; }
+}
+
+// USE CURRENT LOCATION
+document.getElementById('locate-btn').addEventListener('click', () => {
+  const locInput = document.getElementById('location');
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported by your browser.");
+    return;
+  }
+  locInput.value = "Loading, hold on...";
+  navigator.geolocation.getCurrentPosition(async (position) => {
+    const {latitude, longitude} = position.coords;
+    try {
+      // Reverse geocode with free API
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+      const data = await res.json();
+      const city = data.address.city || data.address.town || data.address.village || '';
+      const state = data.address.state || '';
+      locInput.value = city && state ? `${city}, ${state}` : "Location found";
+    } catch {
+      locInput.value = "Failed to get location";
+    }
+  }, () => {
+    locInput.value = "";
+    alert("Permission denied or location unavailable.");
+  });
+});
+
+// SHOW SKILL SECTION
+function showSkillSection(){
+  document.getElementById('auth-container').style.display='none';
+  document.getElementById('skill-section').style.display='block';
+  document.getElementById('logout-container').style.display='block';
+  const firstName=currentUser.name.split(' ')[0];
+  document.getElementById('welcome-text').innerText=`Welcome ${firstName}`;
+}
+
+// LOGOUT
+function logoutUser(){
+  document.getElementById('skill-section').style.display='none';
+  document.getElementById('auth-container').style.display='block';
+  document.getElementById('logout-container').style.display='none';
+  currentUser=null;
+  localStorage.removeItem('token');
+  document.getElementById('skill').value='';
+  document.getElementById('location').value='';
+  document.getElementById('result').style.display='none';
+  document.getElementById('welcome-text').innerText='SkillConnect';
+}
+
+// EVENT LISTENERS
+document.getElementById('login-tab').addEventListener('click', ()=>switchTab('login'));
+document.getElementById('signup-tab').addEventListener('click', ()=>switchTab('signup'));
+document.getElementById('login-btn').addEventListener('click', loginUser);
+document.getElementById('signup-btn').addEventListener('click', signupUser);
+document.getElementById('forgot-btn').addEventListener('click', ()=>{document.getElementById('forgot-email-container').style.display='flex';});
+</script>
+
+</body>
+</html>
