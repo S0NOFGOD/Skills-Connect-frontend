@@ -1,0 +1,229 @@
+<!DOCTYPE html>    
+<html lang="en">    
+<head>    
+<meta charset="UTF-8" />    
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>    
+<title>SkillConnect — Connect with Skilled Professionals</title>    
+    
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">    
+    
+<style>    
+* {margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}    
+body {    
+  min-height:100vh;    
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);    
+  display:flex;align-items:center;justify-content:center;color:#fff;position:relative;    
+}    
+.container{    
+  width:95%;max-width:500px;    
+  background:rgba(255,255,255,0.08);    
+  backdrop-filter:blur(20px);    
+  border-radius:20px;    
+  padding:30px;    
+  box-shadow:0 25px 60px rgba(0,0,0,0.4);    
+  animation:fadeIn 1s ease;    
+}    
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}    
+h1{text-align:center;font-weight:700;margin-bottom:10px;}    
+p{text-align:center;font-size:14px;opacity:0.85;margin-bottom:25px;}    
+input,select,button{width:100%;padding:14px;margin-bottom:15px;border-radius:12px;border:none;outline:none;font-size:14px;}    
+input,select{background:rgba(255,255,255,0.15);color:#fff;}    
+select option{color:#000;}    
+button{background:linear-gradient(135deg,#00c6ff,#0072ff);color:#fff;font-weight:600;cursor:pointer;transition:0.3s ease;}    
+button:hover{transform:scale(1.03);}    
+.tabs{display:flex;justify-content:space-around;margin-bottom:20px;}    
+.tab{padding:10px 20px;cursor:pointer;border-radius:12px;transition:0.3s ease;}    
+.tab.active{background:linear-gradient(135deg,#00c6ff,#0072ff);font-weight:700;}    
+.form-section{display:none;flex-direction:column;}    
+.form-section.active{display:flex;}    
+.error{color:#ff4b5c;font-size:12px;margin-bottom:10px;}    
+.password-wrapper{position:relative;width:100%;}    
+.password-wrapper input{padding-right:40px;}    
+.password-wrapper .toggle-password{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#fff;opacity:0.7;user-select:none;}    
+.password-wrapper .toggle-password:hover{opacity:1;}    
+#get-location-btn{background:linear-gradient(135deg,#ffb347,#ffcc33);color:#000;font-weight:600;cursor:pointer;margin-bottom:15px;}    
+</style>    
+</head>    
+<body>    
+    
+<div class="container" id="auth-container">    
+  <h1>Welcome to SkillConnect</h1>    
+  <p>Sign up or log in to find clients near you</p>    
+    
+  <div class="tabs">    
+    <div class="tab active" id="login-tab">Login</div>    
+    <div class="tab" id="signup-tab">Signup</div>    
+  </div>    
+    
+  <!-- LOGIN FORM -->    
+  <div class="form-section active" id="login">    
+    
+    <div class="error" id="login-error"></div>    
+    
+    <input type="email" id="login-email" placeholder="Email" required />    
+    
+    <div class="password-wrapper">    
+      <input type="password" id="login-password" placeholder="Password" required />    
+      <span class="toggle-password" data-target="login-password">👁️</span>    
+    </div>    
+    
+    <button id="login-btn">Login</button>    
+    
+    <button id="forgot-btn" style="background:linear-gradient(135deg,#ff6a00,#ee0979);margin-top:5px;">Forgot Password?</button>    
+    
+    <!-- FORGOT EMAIL CONTAINER -->    
+    <div id="forgot-email-container" style="display:none;flex-direction:column;">    
+      <input type="email" id="forgot-email" placeholder="Enter your email to reset password" />    
+      
+      <!-- CHANGED TEXT HERE -->
+      <button id="send-reset-btn" style="background:linear-gradient(135deg,#ff99cc,#ff3399);">
+        Send Reset Code
+      </button>    
+    </div>    
+    
+    <!-- RESET PASSWORD CONTAINER -->    
+    <div id="reset-password-container" style="display:none;flex-direction:column;">    
+    
+      <input type="text" id="reset-code" placeholder="Enter code received" />    
+    
+      <div class="password-wrapper">    
+        <input type="password" id="new-password" placeholder="New Password" />    
+        <span class="toggle-password" data-target="new-password">👁️</span>    
+      </div>    
+    
+      <div class="password-wrapper">    
+        <input type="password" id="confirm-new-password" placeholder="Confirm Password" />    
+        <span class="toggle-password" data-target="confirm-new-password">👁️</span>    
+      </div>    
+    
+      <button id="reset-password-btn" style="background:linear-gradient(135deg,#33ccff,#0066ff);">Reset Password</button>    
+    
+    </div>    
+    
+  </div>    
+    
+</div>    
+    
+<script>    
+    
+const BACKEND_URL = "https://skillconnect-backend-uv3z.onrender.com";    
+    
+// PASSWORD TOGGLE    
+document.addEventListener('click', e=>{    
+  if(e.target.classList.contains('toggle-password')){    
+    const input=document.getElementById(e.target.dataset.target);    
+    input.type=input.type==='password'?'text':'password';    
+  }    
+});    
+    
+// TAB SWITCH    
+function switchTab(tab){    
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));    
+  document.querySelectorAll('.form-section').forEach(f=>f.classList.remove('active'));    
+    
+  document.getElementById(tab).classList.add('active');    
+  document.getElementById(tab+'-tab').classList.add('active');    
+    
+  document.getElementById('forgot-email-container').style.display='none';    
+  document.getElementById('reset-password-container').style.display='none';    
+}    
+    
+document.getElementById('login-tab').addEventListener('click',()=>switchTab('login'));    
+document.getElementById('signup-tab').addEventListener('click',()=>switchTab('signup'));    
+    
+    
+// SHOW EMAIL INPUT    
+document.getElementById('forgot-btn').addEventListener('click',()=>{    
+  document.getElementById('forgot-email-container').style.display='flex';    
+});    
+    
+    
+// SEND RESET CODE    
+document.getElementById('send-reset-btn').addEventListener('click', async ()=>{    
+    
+  const email=document.getElementById('forgot-email').value.trim();    
+    
+  if(!email){    
+    alert("Please enter your email");    
+    return;    
+  }    
+    
+  try{    
+    
+    const res=await fetch(`${BACKEND_URL}/forgot-password`,{    
+      method:"POST",    
+      headers:{"Content-Type":"application/json"},    
+      body:JSON.stringify({email})    
+    });    
+    
+    const data=await res.json();    
+    
+    if(!res.ok){    
+      alert(data.message || "Failed to send reset code");    
+      return;    
+    }    
+    
+    alert("Reset code sent successfully to your email");    
+    
+    document.getElementById('reset-password-container').style.display='flex';    
+    
+  }    
+    
+  catch(err){    
+    console.error(err);    
+    alert("Server error. Try again.");    
+  }    
+    
+});    
+    
+    
+// RESET PASSWORD    
+document.getElementById('reset-password-btn').addEventListener('click', async ()=>{    
+    
+  const email=document.getElementById('forgot-email').value.trim();    
+  const code=document.getElementById('reset-code').value.trim();    
+  const newPassword=document.getElementById('new-password').value.trim();    
+  const confirmPassword=document.getElementById('confirm-new-password').value.trim();    
+    
+  if(!email||!code||!newPassword||!confirmPassword){    
+    alert("All fields required");    
+    return;    
+  }    
+    
+  if(newPassword!==confirmPassword){    
+    alert("Passwords do not match");    
+    return;    
+  }    
+    
+  try{    
+    
+    const res=await fetch(`${BACKEND_URL}/reset-password`,{    
+      method:"POST",    
+      headers:{"Content-Type":"application/json"},    
+      body:JSON.stringify({email,code,newPassword})    
+    });    
+    
+    const data=await res.json();    
+    
+    if(!res.ok){    
+      alert(data.message||"Reset failed");    
+      return;    
+    }    
+    
+    alert("Password reset successful");    
+    
+    document.getElementById('forgot-email-container').style.display='none';    
+    document.getElementById('reset-password-container').style.display='none';    
+    
+  }    
+    
+  catch(err){    
+    alert("Error resetting password");    
+  }    
+    
+});    
+    
+</script>    
+    
+</body>    
+  </html>
