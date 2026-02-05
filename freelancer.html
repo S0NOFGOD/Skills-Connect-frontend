@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SkillConnect — Connect with Skilled Professionals</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* {margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
+body {
+  min-height:100vh;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  display:flex;align-items:center;justify-content:center;color:#fff;
+}
+.container{
+  width:95%;max-width:500px;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(20px);
+  border-radius:20px;
+  padding:30px;
+  box-shadow:0 25px 60px rgba(0,0,0,0.4);
+}
+h1{text-align:center;margin-bottom:10px;}
+p{text-align:center;font-size:14px;opacity:0.85;margin-bottom:25px;}
+input,button{
+  width:100%;
+  padding:14px;
+  margin-bottom:12px;
+  border-radius:12px;
+  border:none;
+  outline:none;
+  font-size:14px;
+}
+input{
+  background:rgba(255,255,255,0.15);
+  color:#fff;
+}
+button{
+  background:linear-gradient(135deg,#00c6ff,#0072ff);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+}
+button:disabled{
+  opacity:0.6;
+  cursor:not-allowed;
+}
+.tabs{display:flex;justify-content:space-around;margin-bottom:20px;}
+.tab{padding:10px 20px;cursor:pointer;border-radius:12px;}
+.tab.active{background:linear-gradient(135deg,#00c6ff,#0072ff);}
+.form-section{display:none;}
+.form-section.active{display:flex;flex-direction:column;}
+.error{color:#ff4b5c;font-size:13px;margin-bottom:10px;text-align:center;}
+.success{color:#00ffae;font-size:13px;margin-bottom:10px;text-align:center;}
+.password-wrapper{position:relative;}
+.password-wrapper input{padding-right:40px;}
+.toggle-password{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  cursor:pointer;
+}
+.location-finder-btn{
+  margin-bottom:10px;
+  background:linear-gradient(135deg,#ff9900,#ff6600);
+  font-weight:600;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Welcome to SkillConnect</h1>
+<p>Login or create an account</p>
+
+<div class="tabs">
+<div class="tab active" id="login-tab">Login</div>
+<div class="tab" id="signup-tab">Signup</div>
+</div>
+
+<!-- LOGIN -->
+<div class="form-section active" id="login">
+<div class="error" id="login-error"></div>
+<div class="success" id="login-success"></div>
+<input type="email" id="login-email" placeholder="Email">
+<div class="password-wrapper">
+<input type="password" id="login-password" placeholder="Password">
+<span class="toggle-password" data-target="login-password">👁️</span>
+</div>
+<button id="login-btn">Login</button>
+<button id="forgot-btn" style="background:linear-gradient(135deg,#ff6a00,#ee0979)">Forgot Password?</button>
+
+<!-- FORGOT EMAIL -->
+<div id="forgot-email-container" style="display:none;flex-direction:column;">
+<div class="error" id="forgot-error"></div>
+<div class="success" id="forgot-success"></div>
+<input type="email" id="forgot-email" placeholder="Enter your email">
+<button id="send-reset-btn" style="background:linear-gradient(135deg,#ff99cc,#ff3399)">Send Reset Code</button>
+</div>
+
+<!-- RESET PASSWORD -->
+<div id="reset-password-container" style="display:none;flex-direction:column;">
+<div class="error" id="reset-error"></div>
+<div class="success" id="reset-success"></div>
+<input type="text" id="reset-code" placeholder="Enter reset code">
+<div class="password-wrapper">
+<input type="password" id="new-password" placeholder="New password">
+<span class="toggle-password" data-target="new-password">👁️</span>
+</div>
+<div class="password-wrapper">
+<input type="password" id="confirm-new-password" placeholder="Confirm password">
+<span class="toggle-password" data-target="confirm-new-password">👁️</span>
+</div>
+<button id="reset-password-btn">Reset Password</button>
+</div>
+</div>
+
+<!-- SIGNUP -->
+<div class="form-section" id="signup">
+<div class="error" id="signup-error"></div>
+<div class="success" id="signup-success"></div>
+
+<input type="text" id="signup-name" placeholder="Full Name">
+<input type="email" id="signup-email" placeholder="Email">
+<input type="tel" id="signup-phone" placeholder="Phone Number">
+
+<!-- PREMIUM LOCATION FINDER -->
+<button type="button" class="location-finder-btn" id="find-location-btn">Find My Location</button>
+<input type="text" id="signup-location" placeholder="Location" readonly>
+
+<div class="password-wrapper">
+<input type="password" id="signup-password" placeholder="Password">
+<span class="toggle-password" data-target="signup-password">👁️</span>
+</div>
+<div class="password-wrapper">
+<input type="password" id="signup-confirm-password" placeholder="Confirm Password">
+<span class="toggle-password" data-target="signup-confirm-password">👁️</span>
+</div>
+<button id="signup-btn">Create Account</button>
+</div>
+
+</div>
+
+<script>
+const BACKEND_URL="https://skillconnect-backend-uv3z.onrender.com";
+
+// ELEMENTS
+const loginTab = document.getElementById("login-tab");
+const signupTab = document.getElementById("signup-tab");
+const forgotBtn = document.getElementById("forgot-btn");
+const sendResetBtn = document.getElementById("send-reset-btn");
+const resetPasswordBtn = document.getElementById("reset-password-btn");
+const signupBtn = document.getElementById("signup-btn");
+const findLocationBtn = document.getElementById("find-location-btn");
+const signupLocationInput = document.getElementById("signup-location");
+
+const loginEmail = document.getElementById("login-email");
+const loginPassword = document.getElementById("login-password");
+const forgotEmail = document.getElementById("forgot-email");
+const resetCode = document.getElementById("reset-code");
+const newPassword = document.getElementById("new-password");
+const confirmNewPassword = document.getElementById("confirm-new-password");
+const signupName = document.getElementById("signup-name");
+const signupEmail = document.getElementById("signup-email");
+const signupPhone = document.getElementById("signup-phone");
+const signupPassword = document.getElementById("signup-password");
+const signupConfirm = document.getElementById("signup-confirm-password");
+
+// PASSWORD TOGGLE
+document.addEventListener("click",(e)=>{
+  if(e.target.classList.contains("toggle-password")){
+    const input=document.getElementById(e.target.dataset.target);
+    input.type=input.type==="password"?"text":"password";
+  }
+});
+
+// TAB SWITCH
+function switchTab(tab){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".form-section").forEach(f=>f.classList.remove("active"));
+  document.getElementById(tab).classList.add("active");
+  document.getElementById(tab+"-tab").classList.add("active");
+  document.getElementById("forgot-email-container").style.display="none";
+  document.getElementById("reset-password-container").style.display="none";
+}
+loginTab.onclick = ()=>switchTab("login");
+signupTab.onclick = ()=>switchTab("signup");
+
+// SHOW FORGOT PASSWORD FORM
+forgotBtn.onclick = ()=>{
+  document.getElementById("forgot-email-container").style.display="flex";
+  document.getElementById("reset-password-container").style.display="none";
+  document.getElementById("login-email").style.display="none";
+  document.getElementById("login-password").style.display="none";
+  forgotBtn.style.display="none";
+  document.getElementById("login-btn").style.display="none";
+  document.getElementById("login-error").innerText="";
+  document.getElementById("login-success").innerText="";
+};
+
+// EMAIL & PASSWORD VALIDATORS
+function validEmail(email){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+function validPassword(password){ return password.length>=6; }
+
+// LOCATION FINDER
+findLocationBtn.onclick = ()=>{
+  signupLocationInput.value = "Loading… hold on";
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(async (pos)=>{
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      try{
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+        const data = await res.json();
+        const city = data.address.city || data.address.town || data.address.village || '';
+        const state = data.address.state || '';
+        signupLocationInput.value = city && state ? `${city}, ${state}` : "Location not found";
+      }catch{
+        signupLocationInput.value = "Failed to fetch location";
+      }
+    },()=>{
+      signupLocationInput.value = "Location permission denied";
+    });
+  }else{
+    signupLocationInput.value = "Geolocation not supported";
+  }
+};
+
+// LOGIN
+document.getElementById("login-btn").onclick = async ()=>{
+  const loginError = document.getElementById("login-error");
+  const loginSuccess = document.getElementById("login-success");
+  loginError.innerText=""; loginSuccess.innerText="";
+  const email = loginEmail.value.trim();
+  const password = loginPassword.value.trim();
+  if(!email || !password){ loginError.innerText="All fields required"; return;}
+  if(!validEmail(email)){ loginError.innerText="Enter valid email"; return;}
+  if(!validPassword(password)){ loginError.innerText="Password must be at least 6 characters"; return;}
+  
+  loginEmail.disabled = loginPassword.disabled = true;
+  const loginBtn = document.getElementById("login-btn");
+  loginBtn.disabled=true; loginBtn.innerText="Logging in...";
+  try{
+    const res = await fetch(`${BACKEND_URL}/login`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({email,password})
+    });
+    const data = await res.json();
+    if(!res.ok){ loginError.innerText = data.message || "Login failed"; loginBtn.disabled=false; loginBtn.innerText="Login"; loginEmail.disabled=loginPassword.disabled=false; return;}
+    loginSuccess.innerText="Login successful!";
+    loginBtn.innerText="Success ✓";
+  }catch{
+    loginError.innerText="Server error"; loginBtn.disabled=false; loginBtn.innerText="Login"; loginEmail.disabled=loginPassword.disabled=false;
+  }
+};
+
+// FORGOT PASSWORD
+sendResetBtn.onclick = async ()=>{
+  const forgotError = document.getElementById("forgot-error");
+  const forgotSuccess = document.getElementById("forgot-success");
+  forgotError.innerText=""; forgotSuccess.innerText="";
+  const email = forgotEmail.value.trim();
+  if(!email){ forgotError.innerText="Email is required"; return;}
+  if(!validEmail(email)){ forgotError.innerText="Enter valid email"; return;}
+  
+  sendResetBtn.disabled=true; sendResetBtn.innerText="Sending...";
+  try{
+    const res = await fetch(`${BACKEND_URL}/forgot-password`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({email})
+    });
+    const data = await res.json();
+    if(!res.ok){ forgotError.innerText=data.message||"Failed to send code"; sendResetBtn.disabled=false; sendResetBtn.innerText="Send Reset Code"; return;}
+    forgotSuccess.innerText="Reset code sent!";
+    sendResetBtn.innerText="Code Sent ✓";
+    document.getElementById("reset-password-container").style.display="flex";
+  }catch{
+    forgotError.innerText="Server error"; sendResetBtn.disabled=false; sendResetBtn.innerText="Send Reset Code";
+  }
+};
+
+// RESET PASSWORD
+resetPasswordBtn.onclick = async ()=>{
+  const resetError = document.getElementById("reset-error");
+  const resetSuccess = document.getElementById("reset-success");
+  resetError.innerText=""; resetSuccess.innerText="";
+  const email = forgotEmail.value.trim();
+  const codeVal = resetCode.value.trim();
+  const newPassVal = newPassword.value.trim();
+  const confirmPassVal = confirmNewPassword.value.trim();
+  if(!email||!codeVal||!newPassVal||!confirmPassVal){ resetError.innerText="All fields required"; return;}
+  if(!validPassword(newPassVal)){ resetError.innerText="Password must be at least 6 characters"; return;}
+  if(newPassVal!==confirmPassVal){ resetError.innerText="Passwords do not match"; return;}
+  
+  resetPasswordBtn.disabled=true; resetPasswordBtn.innerText="Resetting...";
+  try{
+    const res = await fetch(`${BACKEND_URL}/reset-password`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({email, code: codeVal, newPassword: newPassVal})
+    });
+    const data = await res.json();
+    if(!res.ok){ resetError.innerText=data.message||"Reset failed"; resetPasswordBtn.disabled=false; resetPasswordBtn.innerText="Reset Password"; return;}
+    resetSuccess.innerText="Password reset successful!";
+    resetPasswordBtn.innerText="Success ✓";
+  }catch{
+    resetError.innerText="Server error"; resetPasswordBtn.disabled=false; resetPasswordBtn.innerText="Reset Password";
+  }
+};
+
+// SIGNUP
+signupBtn.onclick = async ()=>{
+  const signupError = document.getElementById("signup-error");
+  const signupSuccess = document.getElementById("signup-success");
+  signupError.innerText=""; signupSuccess.innerText="";
+
+  const name = signupName.value.trim();
+  const email = signupEmail.value.trim();
+  const phone = signupPhone.value.trim();
+  const location = signupLocationInput.value.trim();
+  const password = signupPassword.value.trim();
+  const confirm = signupConfirm.value.trim();
+
+  if(!name||!email||!phone||!location||!password||!confirm){ signupError.innerText="All fields required"; return;}
+  if(!validEmail(email)){ signupError.innerText="Enter valid email"; return;}
+  if(!validPassword(password)){ signupError.innerText="Password must be at least 6 characters"; return;}
+  if(password!==confirm){ signupError.innerText="Passwords do not match"; return;}
+
+  signupBtn.disabled=true; signupBtn.innerText="Creating...";
+  try{
+    const res = await fetch(`${BACKEND_URL}/signup`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({name,email,phone,location,password})
+    });
+    const data = await res.json();
+    if(!res.ok){ signupError.innerText=data.message||"Signup failed"; signupBtn.disabled=false; signupBtn.innerText="Create Account"; return;}
+    signupSuccess.innerText="Account created successfully!";
+    signupBtn.innerText="Success ✓";
+  }catch{
+    signupError.innerText="Server error"; signupBtn.disabled=false; signupBtn.innerText="Create Account";
+  }
+};
+</script>
+</body>
+</html>
