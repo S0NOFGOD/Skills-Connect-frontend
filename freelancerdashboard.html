@@ -1,0 +1,291 @@
+<!DOCTYPE html>    
+<html lang="en">    
+<head>    
+<meta charset="UTF-8">    
+<meta name="viewport" content="width=device-width, initial-scale=1.0">    
+<title>SkillConnect — User Dashboard</title>    
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">    
+<style>    
+  * {margin:0; padding:0; box-sizing:border-box; font-family:'Montserrat',sans-serif;}    
+  
+  body {    
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);  
+    display: flex;    
+    justify-content: center;    
+    align-items: flex-start;    
+    min-height: 100vh;    
+    padding: 20px;    
+    color: #fff;  
+  }    
+  
+  .dashboard-card {    
+    background: rgba(255,255,255,0.05);    
+    backdrop-filter: blur(25px);  
+    width: 100%;    
+    max-width: 420px;    
+    border-radius: 24px;    
+    box-shadow: 0 25px 60px rgba(0,0,0,0.4);    
+    padding: 25px;    
+    text-align: center;    
+    animation: fadeIn 1s ease;  
+  }    
+  
+  @keyframes fadeIn {  
+    from {opacity:0; transform: translateY(20px);}  
+    to {opacity:1; transform: translateY(0);}  
+  }  
+  
+  .welcome h1 {    
+    font-size: 24px;    
+    font-weight: 700;    
+    color: #fff;    
+    margin-bottom: 6px;    
+  }    
+  
+  .welcome p {    
+    font-size: 14px;    
+    color: rgba(255,255,255,0.85);    
+    margin-bottom: 20px;    
+  }    
+  
+  .profile-image {    
+    width: 130px;    
+    height: 130px;    
+    border-radius: 50%;    
+    object-fit: cover;    
+    margin: 0 auto 20px;    
+    border: 5px solid #00c6ff;    
+  }    
+  
+  .info-row {    
+    display: flex;    
+    justify-content: space-between;    
+    align-items: center;    
+    background: rgba(255,255,255,0.05);    
+    margin: 8px 0;    
+    padding: 12px 16px;    
+    border-radius: 12px;    
+    font-weight: 500;    
+    color: rgba(255,255,255,0.85);    
+    transition: transform 0.2s;    
+  }    
+  
+  .info-row:hover {    
+    transform: translateY(-2px);    
+    box-shadow: 0 4px 12px rgba(0,198,255,0.2);    
+  }    
+  
+  .info-label { font-weight: 500; color: rgba(255,255,255,0.6); }    
+  .info-value { font-weight: 600; color: #fff; }    
+  
+  .btn-hire, .btn-edit {    
+    display: inline-block;    
+    margin-top: 15px;    
+    background: linear-gradient(135deg,#00c6ff,#0072ff);    
+    color: #fff;    
+    padding: 14px 40px;    
+    border-radius: 14px;    
+    font-weight: 600;    
+    text-decoration: none;    
+    transition: transform 0.2s, box-shadow 0.2s;    
+    cursor: pointer;  
+  }    
+  
+  .btn-hire:hover, .btn-edit:hover {    
+    transform: translateY(-3px);    
+    box-shadow: 0 6px 16px rgba(0,198,255,0.3);    
+  }    
+  
+  /* Popup Modal */  
+  .modal {    
+    position: fixed;    
+    top: 0; left: 0;    
+    width: 100%;    
+    height: 100%;    
+    background: rgba(0,0,0,0.7);    
+    display: none;    
+    justify-content: center;    
+    align-items: center;    
+    z-index: 1000;    
+  }    
+  
+  .modal-content {    
+    background: rgba(255,255,255,0.05);    
+    backdrop-filter: blur(25px);    
+    padding: 25px;    
+    border-radius: 20px;    
+    width: 90%;    
+    max-width: 400px;    
+    text-align: left;    
+    position: relative;    
+    color: #fff;  
+  }    
+  
+  .modal-content h2 { margin-bottom: 20px; font-size: 22px; }    
+  
+  .close-btn {    
+    position: absolute;    
+    top: 15px;    
+    right: 20px;    
+    font-size: 20px;    
+    font-weight: bold;    
+    cursor: pointer;    
+    color: #fff;    
+  }    
+  
+  .modal-content label { display: block; margin: 10px 0 5px; font-weight: 500; }    
+  .modal-content input {    
+    width: 100%;    
+    padding: 10px;    
+    border-radius: 8px;    
+    border: none;    
+    margin-bottom: 10px;    
+  }    
+  
+  .modal-content button {    
+    margin-top: 10px;    
+    width: 100%;    
+    background: linear-gradient(135deg,#00c6ff,#0072ff);    
+    padding: 12px;    
+    border: none;    
+    border-radius: 12px;    
+    color: #fff;    
+    font-weight: 600;    
+    cursor: pointer;    
+    transition: transform 0.2s, box-shadow 0.2s;    
+  }    
+  
+  .modal-content button:hover {    
+    transform: translateY(-2px);    
+    box-shadow: 0 4px 12px rgba(0,198,255,0.3);    
+  }  
+  
+  @media (max-width:420px){    
+    .dashboard-card { padding: 20px; }    
+    .welcome h1 { font-size: 22px; }    
+    .welcome p { font-size: 13px; }    
+    .profile-image { width: 120px; height: 120px; }    
+  }    
+</style>    
+</head>    
+<body>    
+  
+<div class="dashboard-card">    
+  <div class="welcome">    
+    <h1>Welcome to SkillConnect</h1>    
+    <p>Showcase your skill and get hired</p>    
+  </div>    
+  
+  <img src="" alt="Profile Image" id="profileImage" class="profile-image">    
+  
+  <div class="info-row">    
+    <div class="info-label">Name</div>    
+    <div class="info-value" id="userName">-</div>    
+  </div>    
+  <div class="info-row">    
+    <div class="info-label">Skill</div>    
+    <div class="info-value" id="userSkill">-</div>    
+  </div>    
+  <div class="info-row">    
+    <div class="info-label">Email</div>    
+    <div class="info-value" id="userEmail">-</div>    
+  </div>    
+  <div class="info-row">    
+    <div class="info-label">Projects</div>    
+    <div class="info-value" id="userProjects">0</div>    
+  </div>    
+  <div class="info-row">    
+    <div class="info-label">Ratings</div>    
+    <div class="info-value" id="userRatings">0</div>    
+  </div>    
+  
+  <a href="aboutme.html" class="btn-hire">About Me</a>    
+  <button class="btn-edit" id="editProfileBtn">Edit Profile</button>    
+</div>    
+  
+<!-- Modal -->  
+<div class="modal" id="editModal">  
+  <div class="modal-content">  
+    <span class="close-btn" id="closeModal">&times;</span>  
+    <h2>Edit Profile</h2>  
+    <label for="editName">Name</label>  
+    <input type="text" id="editName">  
+    <label for="editSkill">Skill</label>  
+    <input type="text" id="editSkill">  
+    <label for="editEmail">Email</label>  
+    <input type="email" id="editEmail">  
+    <label for="editPhone">Phone</label>  
+    <input type="tel" id="editPhone" placeholder="e.g. +2348012345678">  
+    <button id="saveProfile">Save Changes</button>  
+  </div>  
+</div>  
+  
+<script>    
+  // Retrieve user info from localStorage
+  let user = JSON.parse(localStorage.getItem('user')) || {};    
+
+  const userName = document.getElementById('userName');  
+  const userSkill = document.getElementById('userSkill');  
+  const userEmail = document.getElementById('userEmail');  
+  const userProjects = document.getElementById('userProjects');  
+  const userRatings = document.getElementById('userRatings');  
+  const profileImage = document.getElementById('profileImage');  
+
+  function updateDashboard() {
+    userName.textContent = user.name || '-';
+    userSkill.textContent = user.skill || '-';
+    userEmail.textContent = user.email || '-';
+    userProjects.textContent = (user.projects != null) ? user.projects : 0;
+    userRatings.textContent = (user.ratings != null) ? user.ratings : 0;
+    profileImage.src = user.image || 'https://via.placeholder.com/130';
+  }
+
+  // Update immediately on page load
+  updateDashboard();
+
+  // Modal functionality
+  const editBtn = document.getElementById('editProfileBtn');  
+  const modal = document.getElementById('editModal');  
+  const closeModal = document.getElementById('closeModal');  
+  const saveBtn = document.getElementById('saveProfile');  
+
+  editBtn.onclick = () => {  
+    modal.style.display = 'flex';  
+    document.getElementById('editName').value = user.name || '';  
+    document.getElementById('editSkill').value = user.skill || '';  
+    document.getElementById('editEmail').value = user.email || '';  
+    document.getElementById('editPhone').value = user.phone || '';  
+  };  
+
+  closeModal.onclick = () => modal.style.display = 'none';  
+  window.onclick = (e) => { if(e.target == modal) modal.style.display = 'none'; };  
+
+  saveBtn.onclick = () => {  
+    const name = document.getElementById('editName').value.trim();  
+    const skill = document.getElementById('editSkill').value.trim();  
+    const email = document.getElementById('editEmail').value.trim();  
+    const phone = document.getElementById('editPhone').value.trim();  
+
+    // Validation  
+    if(!name){ alert('Name is required'); return; }  
+    if(!skill){ alert('Skill is required'); return; }  
+    if(!email || !/^\S+@\S+\.\S+$/.test(email)){ alert('Valid email is required'); return; }  
+    if(!phone || !/^\+?\d{7,15}$/.test(phone)){ alert('Valid phone number is required'); return; }  
+
+    user.name = name;  
+    user.skill = skill;  
+    user.email = email;  
+    user.phone = phone;  
+
+    // Keep existing projects/ratings if already set
+    user.projects = user.projects || 0;
+    user.ratings = user.ratings || 0;
+
+    localStorage.setItem('user', JSON.stringify(user));  
+    updateDashboard();  
+    modal.style.display = 'none';  
+  };  
+</script>    
+  
+</body>    
+  </html>
