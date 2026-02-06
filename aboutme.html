@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Me — SkillConnect</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Montserrat',sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  min-height:100vh;
+  padding:20px;
+  color:#fff;
+}
+
+.about-card {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(25px);
+  width:100%;
+  max-width:420px;
+  border-radius:24px;
+  box-shadow:0 25px 60px rgba(0,0,0,0.4);
+  padding:25px;
+  text-align:center;
+  animation:fadeIn 1s ease;
+}
+
+@keyframes fadeIn {
+  from {opacity:0; transform: translateY(20px);}
+  to {opacity:1; transform: translateY(0);}
+}
+
+.profile-image {
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  object-fit:cover;
+  margin:0 auto 20px;
+  border:5px solid #00c6ff;
+}
+
+h1 {
+  font-size:26px;
+  font-weight:700;
+  margin-bottom:10px;
+  color:#fff;
+}
+
+h2 {
+  font-size:20px;
+  font-weight:600;
+  margin-bottom:15px;
+  color:#00c6ff;
+}
+
+p {
+  font-size:14px;
+  color:rgba(255,255,255,0.85);
+  margin-bottom:20px;
+  line-height:1.6;
+}
+
+.btn-contact {
+  display:inline-block;
+  margin-top:15px;
+  background: linear-gradient(135deg,#00c6ff,#0072ff);
+  color:#fff;
+  padding:14px 40px;
+  border-radius:14px;
+  font-weight:600;
+  text-decoration:none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor:pointer;
+}
+
+.btn-contact:hover {
+  transform: translateY(-3px);
+  box-shadow:0 6px 16px rgba(0,198,255,0.3);
+}
+
+.social-links {
+  display:flex;
+  justify-content:center;
+  gap:15px;
+  margin-top:20px;
+}
+
+.social-links a {
+  color:#fff;
+  font-size:20px;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.social-links a:hover {
+  color:#00c6ff;
+  transform: scale(1.2);
+}
+
+@media(max-width:420px){
+  .about-card { padding:20px; }
+  h1 { font-size:22px; }
+  h2 { font-size:18px; }
+  p { font-size:13px; }
+  .profile-image { width:120px; height:120px; }
+}
+</style>
+</head>
+<body>
+
+<div class="about-card">
+  <img src="aboutme.jpg" alt="Destiny Okpone" class="profile-image">
+  <h1>Destiny Okpone</h1>
+  <h2>Founder of SkillConnect</h2>
+  <p>Hello! I’m Destiny, the founder of SkillConnect — a platform designed to connect skilled professionals with exciting opportunities. My mission is to empower talent and help people showcase their skills to get hired and grow their careers.</p>
+  <p>With a passion for innovation and community-building, I strive to make SkillConnect the go-to hub for freelancers and professionals seeking meaningful connections.</p>
+  <p><strong>Education:</strong> Lautech, Bachelor’s in Computer Science</p>
+  <a href="mailto:destiny@skillconnect.com" class="btn-contact">Contact Me</a>
+  <div class="social-links">
+    <a href="#" title="LinkedIn">&#x1F465;</a>
+    <a href="#" title="Twitter">&#x1F426;</a>
+    <a href="#" title="GitHub">&#x1F4BB;</a>
+  </div>
+</div>
+
+</body>
+  </html>
