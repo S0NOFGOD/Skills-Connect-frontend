@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillConnect</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Montserrat',sans-serif;
+}
+
+body{
+min-height:100vh;
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+display:flex;
+align-items:center;
+justify-content:center;
+color:white;
+}
+
+.container{
+width:95%;
+max-width:500px;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(20px);
+border-radius:20px;
+padding:30px;
+}
+
+.tabs{
+display:flex;
+justify-content:space-around;
+margin-bottom:20px;
+}
+
+.tab{
+padding:10px 20px;
+cursor:pointer;
+border-radius:12px;
+}
+
+.tab.active{
+background:#0072ff;
+}
+
+.form-section{
+display:none;
+flex-direction:column;
+}
+
+.form-section.active{
+display:flex;
+}
+
+input,button,select{
+padding:14px;
+margin-bottom:12px;
+border-radius:12px;
+border:none;
+}
+
+button{
+cursor:pointer;
+background:#0072ff;
+color:white;
+}
+
+.error{
+color:red;
+}
+
+.success{
+color:#00ffaa;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="tabs">
+<div class="tab active" id="login-tab">Login</div>
+<div class="tab" id="signup-tab">Signup</div>
+</div>
+
+<!-- LOGIN -->
+<div id="login" class="form-section active">
+
+<div id="login-error" class="error"></div>
+<div id="login-success" class="success"></div>
+
+<input id="login-email" placeholder="Email">
+<input id="login-password" type="password" placeholder="Password">
+
+<button id="login-btn">Login</button>
+<button id="forgot-btn">Forgot Password</button>
+
+<div id="forgot-email-container" style="display:none">
+
+<div id="forgot-error" class="error"></div>
+<div id="forgot-success" class="success"></div>
+
+<input id="forgot-email" placeholder="Email">
+<button id="send-reset-btn">Send Reset Code</button>
+<button id="back-login-btn">Back</button>
+
+</div>
+
+<div id="reset-password-container" style="display:none">
+
+<div id="reset-error" class="error"></div>
+<div id="reset-success" class="success"></div>
+
+<input id="reset-code" placeholder="Code">
+<input id="new-password" placeholder="New Password">
+<input id="confirm-new-password" placeholder="Confirm Password">
+
+<button id="reset-password-btn">Reset Password</button>
+<button id="back-reset-btn">Back</button>
+
+</div>
+
+</div>
+
+
+<!-- SIGNUP -->
+<div id="signup" class="form-section">
+
+<div id="signup-error" class="error"></div>
+<div id="signup-success" class="success"></div>
+
+<input id="signup-name" placeholder="Name">
+<input id="signup-email" placeholder="Email">
+<input id="signup-phone" placeholder="Phone">
+<input id="signup-location" placeholder="Location">
+
+<input id="signup-password" placeholder="Password">
+<input id="signup-confirm-password" placeholder="Confirm">
+
+<button id="signup-btn">Create Account</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+const BACKEND_URL="https://skillconnect-backend-uv3z.onrender.com";
+
+let resetEmail="";
+
+function safeJSON(res){
+return res.text().then(t=>{
+try{return JSON.parse(t)}
+catch{return {message:t}}
+})
+}
+
+function switchTab(tab){
+
+document.getElementById("login").classList.remove("active");
+document.getElementById("signup").classList.remove("active");
+
+document.getElementById("login-tab").classList.remove("active");
+document.getElementById("signup-tab").classList.remove("active");
+
+document.getElementById(tab).classList.add("active");
+document.getElementById(tab+"-tab").classList.add("active");
+
+}
+
+document.getElementById("login-tab").onclick=()=>switchTab("login");
+document.getElementById("signup-tab").onclick=()=>switchTab("signup");
+
+
+/* LOGIN */
+
+document.getElementById("login-btn").onclick=async()=>{
+
+const email=document.getElementById("login-email").value.trim();
+const password=document.getElementById("login-password").value.trim();
+
+const error=document.getElementById("login-error");
+const success=document.getElementById("login-success");
+
+error.innerText="";
+success.innerText="";
+
+try{
+
+const res=await fetch(`${BACKEND_URL}/login`,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({email,password})
+});
+
+const data=await safeJSON(res);
+
+if(!res.ok)
+error.innerText=data.message;
+
+else{
+success.innerText="Login success";
+}
+
+}catch{
+
+error.innerText="Server error";
+
+}
+
+};
+
+
+/* FORGOT */
+
+document.getElementById("forgot-btn").onclick=()=>{
+
+document.getElementById("forgot-email-container").style.display="block";
+
+};
+
+
+document.getElementById("back-login-btn").onclick=()=>{
+
+document.getElementById("forgot-email-container").style.display="none";
+
+};
+
+
+document.getElementById("back-reset-btn").onclick=()=>{
+
+document.getElementById("reset-password-container").style.display="none";
+
+};
+
+
+/* SEND RESET */
+
+document.getElementById("send-reset-btn").onclick=async()=>{
+
+const email=document.getElementById("forgot-email").value.trim();
+
+resetEmail=email;
+
+const error=document.getElementById("forgot-error");
+
+try{
+
+const res=await fetch(`${BACKEND_URL}/forgot-password`,{
+
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({email})
+
+});
+
+const data=await safeJSON(res);
+
+if(!res.ok)
+error.innerText=data.message;
+
+else{
+
+document.getElementById("reset-password-container").style.display="block";
+
+}
+
+}catch{
+
+error.innerText="Server error";
+
+}
+
+};
+
+
+
+/* RESET */
+
+document.getElementById("reset-password-btn").onclick=async()=>{
+
+const code=document.getElementById("reset-code").value.trim();
+const newPassword=document.getElementById("new-password").value.trim();
+
+const error=document.getElementById("reset-error");
+
+try{
+
+const res=await fetch(`${BACKEND_URL}/reset-password`,{
+
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+
+email:resetEmail,
+code,
+newPassword
+
+})
+
+});
+
+const data=await safeJSON(res);
+
+if(!res.ok)
+error.innerText=data.message;
+
+else{
+
+document.getElementById("reset-success").innerText="Password reset success";
+
+}
+
+}catch{
+
+error.innerText="Server error";
+
+}
+
+};
+
+
+
+/* SIGNUP */
+
+document.getElementById("signup-btn").onclick=async()=>{
+
+const formData=new FormData();
+
+formData.append("name",document.getElementById("signup-name").value);
+formData.append("email",document.getElementById("signup-email").value);
+formData.append("phone",document.getElementById("signup-phone").value);
+formData.append("location",document.getElementById("signup-location").value);
+formData.append("password",document.getElementById("signup-password").value);
+
+const error=document.getElementById("signup-error");
+
+try{
+
+const res=await fetch(`${BACKEND_URL}/signup`,{
+
+method:"POST",
+body:formData
+
+});
+
+const data=await safeJSON(res);
+
+if(!res.ok)
+error.innerText=data.message;
+
+else{
+
+document.getElementById("signup-success").innerText="Account created";
+
+}
+
+}catch{
+
+error.innerText="Server error";
+
+}
+
+};
+
+</script>
+
+</body>
+  </html>
