@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<div class="mobile-container">
+
+<h2 id="welcome"></h2>
+
+<div class="card">
+
+<img id="photo" class="profile-img">
+
+<p id="name"></p>
+<p id="skill"></p>
+<p id="phone"></p>
+<p id="location"></p>
+<p id="rating"></p>
+<p id="projects"></p>
+
+</div>
+
+
+<button class="btn" onclick="edit()">Edit Account</button>
+
+<br><br>
+
+<button class="btn" onclick="deleteAcc()">Delete Account</button>
+
+<br><br>
+
+<button class="btn" onclick="location.href='aboutme.html'">About Me</button>
+
+</div>
+
+
+<div id="editCard" class="card" style="display:none;">
+
+<input id="edit_name" class="input">
+
+<select id="edit_skill" class="input">
+
+<option>Barber</option>
+<option>Hair Stylist</option>
+<option>Tailor</option>
+
+</select>
+
+<input id="edit_location" class="input" readonly>
+
+<button class="btn" onclick="update()">Update</button>
+
+</div>
+
+
+<script src="js/app.js"></script>
+
+<script>
+
+let session = getSession();
+
+if(!session){
+location.href="freelancer.html";
+}
+
+let user = session.user;
+
+welcome.innerText =
+"Welcome, " + user.name.split(" ")[0];
+
+photo.src = user.photo;
+
+name.innerText = user.name;
+
+skill.innerText = "Skill: " + user.skill;
+
+phone.innerText = "Phone: " + user.phone;
+
+location.innerText = "Location: " + user.location;
+
+rating.innerText = "Rating: " + user.rating;
+
+projects.innerText = "Projects: " + user.projects;
+
+
+function edit(){
+
+editCard.style.display="block";
+
+edit_name.value=user.name;
+
+edit_skill.value=user.skill;
+
+edit_location.value=user.location;
+
+}
+
+
+function update(){
+
+let freelancers=getFreelancers();
+
+let u=freelancers.find(x=>x.email===user.email);
+
+u.name=edit_name.value;
+
+u.skill=edit_skill.value;
+
+saveFreelancers(freelancers);
+
+setSession(u,"freelancer");
+
+alert("Updated");
+
+location.reload();
+
+}
+
+
+function deleteAcc(){
+
+if(!confirm("Delete account?")) return;
+
+deleteFreelancer(user.email);
+
+logout();
+
+location.href="index.html";
+
+}
+
+</script>
+
+</body>
+</html>
