@@ -1,0 +1,152 @@
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: 'Montserrat', sans-serif;
+}
+
+body {
+background: linear-gradient(135deg, #0f172a, #020617);
+color: white;
+display: flex;
+justify-content: center;
+min-height: 100vh;
+}
+
+/* MOBILE LOCK */
+
+.mobile-container {
+width: 100%;
+max-width: 420px;
+min-height: 100vh;
+background: #020617;
+padding: 24px;
+}
+
+/* LANDING */
+
+.landing {
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+height: 100vh;
+text-align: center;
+}
+
+.logo {
+font-size: 32px;
+font-weight: 700;
+background: linear-gradient(90deg, #3b82f6, #06b6d4);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+margin-bottom: 16px;
+}
+
+.tagline {
+font-size: 15px;
+color: #94a3b8;
+margin-bottom: 40px;
+}
+
+.cta-container {
+width: 100%;
+display: flex;
+flex-direction: column;
+gap: 16px;
+}
+
+.cta-btn {
+padding: 16px;
+border-radius: 14px;
+border: none;
+font-size: 16px;
+font-weight: 600;
+cursor: pointer;
+transition: 0.3s;
+}
+
+.freelancer-btn {
+background: linear-gradient(90deg, #3b82f6, #06b6d4);
+color: white;
+}
+
+.client-btn {
+background: linear-gradient(90deg, #10b981, #059669);
+color: white;
+}
+
+.cta-btn:hover {
+transform: scale(1.03);
+}
+
+/* CARD */
+
+.card {
+background: #020617;
+border: 1px solid #1e293b;
+padding: 16px;
+border-radius: 16px;
+margin-bottom: 16px;
+}
+
+/* INPUT */
+
+.input {
+width: 100%;
+padding: 14px;
+border-radius: 12px;
+border: 1px solid #1e293b;
+background: #020617;
+color: white;
+margin-bottom: 14px;
+}
+
+.input:focus {
+outline: none;
+border: 1px solid #3b82f6;
+}
+
+/* BUTTON */
+
+.btn {
+width: 100%;
+padding: 14px;
+border-radius: 12px;
+border: none;
+background: linear-gradient(90deg,#3b82f6,#06b6d4);
+color: white;
+font-weight: 600;
+cursor: pointer;
+}
+
+/* SCROLL ROW */
+
+.scroll-row {
+display: flex;
+gap: 16px;
+overflow-x: auto;
+padding-bottom: 10px;
+}
+
+.scroll-row::-webkit-scrollbar {
+display: none;
+}
+
+/* PROFILE CARD */
+
+.profile-card {
+min-width: 220px;
+background: #020617;
+border: 1px solid #1e293b;
+border-radius: 16px;
+padding: 16px;
+}
+
+.profile-img {
+width: 100%;
+height: 160px;
+border-radius: 12px;
+object-fit: cover;
+margin-bottom: 10px;
+}
