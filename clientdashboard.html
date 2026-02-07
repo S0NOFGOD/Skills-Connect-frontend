@@ -1,0 +1,317 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+<meta charset="UTF-8" />  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>SkillConnect — Client Dashboard</title>  
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">  
+<style>  
+* {margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}  
+body {  
+  min-height:100vh;  
+  display:flex;  
+  flex-direction:column;  
+  align-items:center;  
+  justify-content:flex-start;  
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);  
+  color:#fff;  
+  padding:30px 15px;  
+}  
+
+.dashboard-container {  
+  width:100%;  
+  max-width:450px;  
+  text-align:center;  
+  background: rgba(255,255,255,0.05);  
+  backdrop-filter: blur(25px);  
+  padding:20px 20px;  
+  border-radius:20px;  
+  box-shadow: 0 25px 60px rgba(0,0,0,0.4);  
+  animation: fadeIn 1s ease;  
+}  
+
+@keyframes fadeIn {  
+  from {opacity:0; transform: translateY(20px);}  
+  to {opacity:1; transform: translateY(0);}  
+}  
+
+h1 {  
+  font-size:2rem;  
+  margin-bottom:20px;  
+  font-weight:700;  
+}  
+
+.button-row {  
+  display:flex;  
+  justify-content:space-between;  
+  margin:25px 0;  
+  gap:10px;  
+}  
+
+.button-row button {  
+  flex:1;  
+  padding:12px 8px;  
+  border:none;  
+  border-radius:12px;  
+  font-weight:600;  
+  font-size:0.95rem;  
+  cursor:pointer;  
+  transition:0.3s ease;  
+  color:#fff;  
+}  
+
+.logout-btn {background: linear-gradient(135deg,#00c6ff,#0072ff);}  
+.about-btn {background: linear-gradient(135deg,#ffa500,#ff6600);}  
+.delete-btn {background: linear-gradient(135deg,#ff4d4d,#cc0000);}  
+
+.button-row button:hover {  
+  transform: scale(1.05);  
+}  
+
+.location-container {  
+  margin-top:20px;  
+  text-align:left;  
+}  
+
+.location-container button {  
+  padding:12px 15px;  
+  border:none;  
+  border-radius:12px;  
+  font-weight:600;  
+  cursor:pointer;  
+  background: linear-gradient(135deg,#00c6ff,#0072ff);  
+  color:#fff;  
+  margin-bottom:10px;  
+  width:100%;  
+  transition:0.3s ease;  
+}  
+
+.location-container button:hover { transform: scale(1.03); }  
+
+.location-container input,  
+.location-container select {  
+  width:100%;  
+  padding:12px 15px;  
+  border-radius:12px;  
+  border:none;  
+  font-size:1rem;  
+  background: rgba(255,255,255,0.1);  
+  color:#fff;  
+  margin-bottom:10px;  
+}  
+
+.location-container select option{  
+  color:#000;  
+}  
+
+.find-skilled-btn { margin-top:12px; background: linear-gradient(135deg,#ffa500,#ff6600); }  
+
+/* RESULTS GRID */  
+.results-container{  
+  width:100%;  
+  max-width:900px;  
+  margin-top:20px;  
+  display:grid;  
+  grid-template-columns: repeat(auto-fit,minmax(250px,1fr));  
+  gap:15px;  
+}  
+
+/* CARD */  
+.user-card{  
+  background: rgba(255,255,255,0.05);  
+  backdrop-filter: blur(20px);  
+  padding:15px;  
+  border-radius:15px;  
+  text-align:center;  
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);  
+  transition: transform 0.2s ease, box-shadow 0.2s ease;  
+}  
+
+.user-card.highlight{  
+  border: 2px solid #00ffae;  
+  box-shadow: 0 10px 30px rgba(0,255,174,0.5);  
+}  
+
+.user-card img{  
+  width:70px;  
+  height:70px;  
+  border-radius:50%;  
+  object-fit:cover;  
+  margin-bottom:10px;  
+}  
+
+.user-card h3{  
+  font-size:1.1rem;  
+  margin-bottom:5px;  
+}  
+
+.user-card p{  
+  font-size:0.9rem;  
+  opacity:0.85;  
+}  
+
+.user-card:hover{  
+  transform: scale(1.05);  
+  box-shadow: 0 15px 35px rgba(0,0,0,0.5);  
+}  
+
+@media(max-width:400px){  
+  h1 {font-size:1.7rem;}  
+  .button-row button {font-size:0.9rem;padding:10px;}  
+}  
+</style>  
+</head>  
+<body>  
+
+<div class="dashboard-container">  
+  <h1 id="welcome-message">Welcome!</h1>  
+
+  <div class="button-row">  
+    <button class="logout-btn" id="logout-btn">Logout</button>  
+    <button class="about-btn" id="about-btn">About Me</button>  
+    <button class="delete-btn" id="delete-btn">Delete Account</button>  
+  </div>  
+
+  <div class="location-container">  
+
+    <!-- SKILL SELECTION -->
+    <select id="skill-select">
+      <option value="">Select Skill</option>
+      <option value="Barber">Barber</option>
+      <option value="Plumber">Plumber</option>
+      <option value="Electrician">Electrician</option>
+      <option value="Mechanic">Mechanic</option>
+      <option value="Tailor">Tailor</option>
+      <option value="Carpenter">Carpenter</option>
+      <option value="Painter">Painter</option>
+      <option value="Cleaner">Cleaner</option>
+      <option value="Hair Stylist">Hair Stylist</option>
+      <option value="Makeup Artist">Makeup Artist</option>
+    </select>
+
+    <button id="find-location-btn">Find Your Location</button>  
+    <input type="text" id="location-input" placeholder="Your location will appear here" readonly>  
+    <button id="find-skilled-btn" class="find-skilled-btn">Find a Skilled Person</button>  
+
+  </div>  
+</div>  
+
+<div id="results-container" class="results-container"></div>  
+
+<script>  
+
+// Retrieve logged-in user info  
+const loggedInEmail = localStorage.getItem('loggedInUser');  
+const accounts = JSON.parse(localStorage.getItem('users')) || [];  
+let currentUser = accounts.find(u => u.email === loggedInEmail) || {name: 'User'};  
+
+const welcomeMessage = document.getElementById('welcome-message');  
+welcomeMessage.textContent = `Welcome, ${currentUser.name}!`;  
+
+// LOGOUT  
+document.getElementById('logout-btn').addEventListener('click', () => {  
+  window.location.href = 'client.html';  
+});  
+
+// ABOUT ME  
+document.getElementById('about-btn').addEventListener('click', () => {  
+  window.location.href = 'aboutme.html';  
+});  
+
+// DELETE ACCOUNT  
+document.getElementById('delete-btn').addEventListener('click', () => {  
+  if(confirm('Are you sure you want to delete your account?')) {  
+    // Remove current user from accounts array
+    const remainingUsers = accounts.filter(u => u.email !== loggedInEmail);  
+    localStorage.setItem('users', JSON.stringify(remainingUsers));  
+    // Remove logged in user
+    localStorage.removeItem('loggedInUser');  
+    alert('Account deleted.');  
+    // Redirect to client page
+    window.location.href = 'client.html';  
+  }  
+});  
+
+// LOCATION FINDER  
+const findLocationBtn = document.getElementById('find-location-btn');  
+const locationInput = document.getElementById('location-input');  
+
+findLocationBtn.addEventListener('click', () => {  
+  locationInput.value = 'Loading. Hold on...';  
+
+  if (!navigator.geolocation) {  
+    locationInput.value = 'Geolocation is not supported by your browser.';  
+    return;  
+  }  
+
+  navigator.geolocation.getCurrentPosition(async (position) => {  
+    const {latitude, longitude} = position.coords;  
+
+    try {  
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);  
+      const data = await res.json();  
+
+      const city = data.address.city || data.address.town || data.address.village || '';  
+      const state = data.address.state || '';  
+
+      locationInput.value = city && state ? `${city}, ${state}` : 'Location not found';  
+
+    } catch {  
+      locationInput.value = 'Unable to fetch location.';  
+    }  
+
+  }, () => {  
+    locationInput.value = 'Permission denied.';  
+  });  
+});  
+
+// FIND SKILLED PERSON  
+document.getElementById('find-skilled-btn').addEventListener('click', () => {
+
+  const locationValue = locationInput.value.trim().toLowerCase();
+  const skillValue = document.getElementById('skill-select').value.trim().toLowerCase();
+
+  if(!skillValue){
+    alert("Please select a skill.");
+    return;
+  }
+
+  if(!locationValue || locationValue.includes("loading")){
+    alert("Please find your location first.");
+    return;
+  }
+
+  const resultsContainer = document.getElementById('results-container');
+  resultsContainer.innerHTML = "";
+
+  const filteredUsers = accounts.filter(acc => 
+    acc.email !== loggedInEmail &&
+    acc.skill &&
+    acc.location &&
+    acc.skill.toLowerCase().trim() === skillValue &&
+    acc.location.toLowerCase().trim() === locationValue
+  );
+
+  if(filteredUsers.length === 0){
+    resultsContainer.innerHTML = "<p>No skilled persons found with selected skill in your location.</p>";
+    return;
+  }
+
+  filteredUsers.forEach(acc => {
+    const card = document.createElement('div');
+    card.className = "user-card highlight";
+    card.innerHTML = `
+      <img src="${acc.image || 'https://via.placeholder.com/70'}">
+      <h3>${acc.name || 'No Name'}</h3>
+      <p><strong>Skill:</strong> ${acc.skill}</p>
+      <p><strong>Email:</strong> ${acc.email}</p>
+      <p><strong>Location:</strong> ${acc.location}</p>
+    `;
+    resultsContainer.appendChild(card);
+  });
+
+});
+</script>  
+
+</body>  
+  </html>
