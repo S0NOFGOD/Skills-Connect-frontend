@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+<title>About Me — SkillConnect</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+/* ABOUT PAGE PREMIUM DESIGN */
+
+.about-container{
+
+display:flex;
+flex-direction:column;
+align-items:center;
+
+}
+
+.about-img{
+
+width:140px;
+height:140px;
+border-radius:50%;
+object-fit:cover;
+
+border:3px solid #3b82f6;
+
+margin-bottom:20px;
+
+box-shadow:0 0 20px rgba(59,130,246,0.4);
+
+}
+
+.about-name{
+
+font-size:22px;
+font-weight:700;
+margin-bottom:6px;
+
+background: linear-gradient(90deg,#3b82f6,#06b6d4);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+
+}
+
+.about-role{
+
+font-size:14px;
+color:#94a3b8;
+margin-bottom:20px;
+
+}
+
+.about-card{
+
+background:#020617;
+
+border:1px solid #1e293b;
+
+border-radius:16px;
+
+padding:18px;
+
+line-height:1.6;
+
+font-size:14px;
+
+color:#cbd5e1;
+
+}
+
+.back-btn{
+
+margin-top:20px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="mobile-container">
+
+<div class="about-container">
+
+<img src="aboutme.jpg" class="about-img">
+
+<div class="about-name">
+Destiny Okpone
+</div>
+
+<div class="about-role">
+Founder of SkillConnect • Web Developer • Digital Creator
+</div>
+
+
+<div class="about-card">
+
+<p>
+Hello, I'm Destiny Okpone, the creator of SkillConnect.
+</p>
+
+<br>
+
+<p>
+SkillConnect was built to solve a real problem — helping people easily find trusted skilled professionals nearby, and helping skilled individuals connect with clients in their local area.
+</p>
+
+<br>
+
+<p>
+This platform empowers freelancers like barbers, electricians, tailors, mechanics, and many more Nigerian skilled professionals to grow their visibility and get more clients.
+</p>
+
+<br>
+
+<p>
+As a passionate web developer and digital creator, my mission is to build modern, premium, and powerful tools that create opportunities and make life easier for people.
+</p>
+
+<br>
+
+<p>
+SkillConnect is just the beginning of many innovative solutions I am building.
+</p>
+
+</div>
+
+
+<button class="btn back-btn"
+onclick="goBack()">
+Back
+</button>
+
+
+</div>
+
+</div>
+
+<script>
+
+function goBack(){
+
+let session =
+JSON.parse(localStorage.getItem("skillconnect_session"));
+
+if(!session){
+location.href="index.html";
+return;
+}
+
+if(session.type==="freelancer"){
+location.href="freelancerdashboard.html";
+}else{
+location.href="clientdashboard.html";
+}
+
+}
+
+</script>
+
+</body>
+</html>
