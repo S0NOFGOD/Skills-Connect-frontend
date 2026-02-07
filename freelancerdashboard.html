@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillConnect — Freelancer Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Montserrat', sans-serif; }
+  body {
+    background:#0D1117;
+    color:#F0F6FC;
+    min-height:100vh;
+    padding:20px;
+  }
+  .container {
+    max-width:400px;
+    margin:0 auto;
+  }
+  .profile-card {
+    background:#161B22;
+    border-radius:16px;
+    padding:20px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.5);
+    text-align:center;
+  }
+  .profile-card img {
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    object-fit:cover;
+    margin-bottom:15px;
+  }
+  h2 { color:#58A6FF; margin-bottom:5px; }
+  p { font-size:14px; color:#C9D1D9; margin:3px 0; }
+  button {
+    width:100%;
+    padding:12px;
+    margin:8px 0;
+    border:none;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+  }
+  .btn-delete { background:#D64545; color:#fff; }
+  .btn-edit { background:#238636; color:#fff; }
+  .btn-about { background:#1F6FEB; color:#fff; }
+  .btn-logout { background:#7950F2; color:#fff; }
+
+  /* Edit Form Popup */
+  .popup {
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:rgba(0,0,0,0.85);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    visibility:hidden;
+    opacity:0;
+    transition:0.3s;
+  }
+  .popup.active { visibility:visible; opacity:1; }
+  .popup-content {
+    background:#161B22;
+    padding:20px;
+    border-radius:16px;
+    width:90%;
+  }
+  .popup-content input, .popup-content select {
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border-radius:10px;
+    border:1px solid #30363D;
+    background:#0D1117;
+    color:#C9D1D9;
+  }
+  .popup-content button { margin-top:10px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="profile-card">
+    <img id="profileImage" src="" alt="Profile Image">
+    <h2 id="welcomeName">Welcome, Freelancer</h2>
+    <p id="fullName"></p>
+    <p id="email"></p>
+    <p id="phone"></p>
+    <p id="skill"></p>
+    <p id="location"></p>
+  </div>
+
+  <button class="btn-edit" onclick="openEdit()">Edit Account</button>
+  <button class="btn-about" onclick="goAbout()">About Me</button>
+  <button class="btn-delete" onclick="deleteAccount()">Delete Account</button>
+  <button class="btn-logout" onclick="logout()">Logout</button>
+</div>
+
+<!-- Edit Popup -->
+<div class="popup" id="editPopup">
+  <div class="popup-content">
+    <h3>Edit Account</h3>
+    <label>Name</label>
+    <input type="text" id="editName">
+    <label>Skill</label>
+    <select id="editSkill">
+      <option value="">Select Skill</option>
+      <option value="Plumbing">Plumbing</option>
+      <option value="Carpentry">Carpentry</option>
+      <option value="Electrician">Electrician</option>
+      <option value="Haircutting">Haircutting</option>
+      <option value="Cooking">Cooking</option>
+      <option value="Gardening">Gardening</option>
+      <option value="Cleaning">Cleaning</option>
+    </select>
+    <label>Location</label>
+    <input type="text" id="editLocation" readonly>
+    <button onclick="updateAccount()" class="btn-edit">Update</button>
+    <button onclick="closeEdit()" class="btn-delete">Cancel</button>
+  </div>
+</div>
+
+<script>
+// ===== Load User Info =====
+let currentUser = JSON.parse(localStorage.getItem('currentFreelancer'));
+if(!currentUser){ window.location.href='freelancer.html'; }
+
+document.getElementById('welcomeName').innerText = `Welcome, ${currentUser.name.split(' ')[0]}`;
+document.getElementById('profileImage').src = currentUser.image || 'https://via.placeholder.com/100';
+document.getElementById('fullName').innerText = `Full Name: ${currentUser.name}`;
+document.getElementById('email').innerText = `Email: ${currentUser.email}`;
+document.getElementById('phone').innerText = `Phone: ${currentUser.phone}`;
+document.getElementById('skill').innerText = `Skill: ${currentUser.skill}`;
+document.getElementById('location').innerText = `Location: ${currentUser.location}`;
+
+// ===== Edit Account Popup =====
+function openEdit(){
+  document.getElementById('editPopup').classList.add('active');
+  document.getElementById('editName').value = currentUser.name;
+  document.getElementById('editSkill').value = currentUser.skill;
+  document.getElementById('editLocation').value = currentUser.location;
+}
+function closeEdit(){ document.getElementById('editPopup').classList.remove('active'); }
+function updateAccount(){
+  const name = document.getElementById('editName').value.trim();
+  const skill = document.getElementById('editSkill').value;
+
+  if(!name || !skill){ alert('Please fill all fields'); return; }
+
+  currentUser.name = name;
+  currentUser.skill = skill;
+
+  // Update in localStorage
+  const users = JSON.parse(localStorage.getItem('freelancers') || '[]');
+  const index = users.findIndex(u => u.email === currentUser.email);
+  if(index >= 0){ users[index] = currentUser; localStorage.setItem('freelancers', JSON.stringify(users)); }
+
+  localStorage.setItem('currentFreelancer', JSON.stringify(currentUser));
+  alert('Account updated!');
+  location.reload();
+}
+
+// ===== Delete Account =====
+function deleteAccount(){
+  if(confirm('Are you sure you want to delete your account?')){
+    let users = JSON.parse(localStorage.getItem('freelancers') || '[]');
+    users = users.filter(u => u.email !== currentUser.email);
+    localStorage.setItem('freelancers', JSON.stringify(users));
+    localStorage.removeItem('currentFreelancer');
+    alert('Account deleted!');
+    window.location.href='freelancer.html';
+  }
+}
+
+// ===== Logout =====
+function logout(){
+  localStorage.removeItem('currentFreelancer');
+  window.location.href='freelancer.html';
+}
+
+// ===== About Me =====
+function goAbout(){
+  window.location.href='aboutme.html';
+}
+</script>
+</body>
+</html>
