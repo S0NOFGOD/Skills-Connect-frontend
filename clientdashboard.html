@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+
+<div class="mobile-container">
+
+<h2 id="welcome"></h2>
+
+<button class="btn" onclick="logoutUser()">Logout</button>
+
+<br><br>
+
+<button class="btn" onclick="deleteAcc()">Delete Account</button>
+
+<br><br>
+
+<button class="btn" onclick="location.href='aboutme.html'">About Me</button>
+
+<br><br>
+
+<input id="locationInput" class="input" readonly placeholder="Location">
+
+<button class="btn" onclick="fetchLocation()">Find My Location</button>
+
+<br><br>
+
+<select id="skillSelect" class="input">
+
+<option value="">Select Skill</option>
+
+<option>Barber</option>
+<option>Hair Stylist</option>
+<option>Makeup Artist</option>
+<option>Tailor</option>
+<option>Phone Repair Technician</option>
+<option>Plumber</option>
+<option>Electrician</option>
+<option>Carpenter</option>
+<option>Mechanic</option>
+<option>Cleaner</option>
+<option>Chef</option>
+
+</select>
+
+<button class="btn" onclick="find()">Find Skilled Person</button>
+
+<br><br>
+
+<div id="results" class="scroll-row"></div>
+
+</div>
+
+<script src="js/app.js"></script>
+
+<script>
+
+let session=getSession();
+
+if(!session){
+location.href="client.html";
+}
+
+let user=session.user;
+
+welcome.innerText=
+"Welcome, "+user.name.split(" ")[0];
+
+
+// FETCH LOCATION
+
+function fetchLocation(){
+
+locationInput.value=
+"Loading. hold on while fetching coordinates";
+
+getLocation(function(loc){
+locationInput.value=loc;
+});
+
+}
+
+
+// FIND FREELANCERS
+
+function find(){
+
+let skill=skillSelect.value;
+let location=locationInput.value;
+
+if(!skill||!location){
+alert("Select skill and location");
+return;
+}
+
+let freelancers=findFreelancers(skill,location);
+
+results.innerHTML="";
+
+if(freelancers.length===0){
+results.innerHTML="<p>No freelancers found</p>";
+return;
+}
+
+freelancers.forEach(user=>{
+
+results.innerHTML+=`
+
+<div class="profile-card">
+
+<img src="${user.photo}" class="profile-img">
+
+<p><b>${user.name}</b></p>
+
+<p>${user.skill}</p>
+
+<p>${user.location}</p>
+
+<p>${user.phone}</p>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+// LOGOUT
+
+function logoutUser(){
+
+logout();
+
+location.href="client.html";
+
+}
+
+
+// DELETE
+
+function deleteAcc(){
+
+if(!confirm("Delete account?")) return;
+
+deleteClient(user.email);
+
+logout();
+
+location.href="index.html";
+
+}
+
+</script>
+
+</body>
+</html>
