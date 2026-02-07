@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillConnect — Freelancer Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Montserrat', sans-serif; }
+  body { background:#0D1117; color:#F0F6FC; min-height:100vh; padding:20px; }
+  .container { max-width:400px; margin:0 auto; background:#161B22; padding:25px 20px; border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,0.5);}
+  h2 { color:#58A6FF; font-weight:700; margin-bottom:20px; }
+  .profile-img { width:100px; height:100px; border-radius:50%; object-fit:cover; margin:0 auto 15px; display:block; }
+  .info { margin:10px 0; }
+  .info span { font-weight:600; color:#58A6FF; }
+  button { width:100%; padding:12px; margin:8px 0; border:none; border-radius:10px; font-weight:600; cursor:pointer; transition:0.3s; }
+  .btn-delete { background:#CF222E; color:#fff; }
+  .btn-edit { background:#238636; color:#fff; }
+  .btn-about { background:#1F6FEB; color:#fff; }
+  .btn-rating { background:#D29922; color:#fff; }
+  .btn-projects { background:#7950F2; color:#fff; }
+  button:hover { opacity:0.9; }
+
+  /* Modal for edit */
+  .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; }
+  .modal-content { background:#161B22; padding:20px; border-radius:16px; width:90%; max-width:350px; }
+  .modal-content input, .modal-content select, .modal-content button { margin:8px 0; width:100%; padding:10px; border-radius:10px; border:none; }
+  .close { float:right; cursor:pointer; color:#58A6FF; font-weight:700; font-size:18px; }
+</style>
+</head>
+<body>
+
+<div class="container" id="dashboard">
+  <h2 id="welcome">Welcome, Freelancer</h2>
+  <img src="" alt="Profile Image" class="profile-img" id="profileImage">
+  
+  <div class="info"><span>Full Name:</span> <span id="fullName"></span></div>
+  <div class="info"><span>Email:</span> <span id="email"></span></div>
+  <div class="info"><span>Phone:</span> <span id="phone"></span></div>
+  <div class="info"><span>Skill:</span> <span id="skill"></span></div>
+  <div class="info"><span>Location:</span> <span id="location"></span></div>
+
+  <button class="btn-edit" onclick="openEditModal()">Edit Account</button>
+  <button class="btn-delete" onclick="deleteAccount()">Delete Account</button>
+  <button class="btn-about" onclick="goAbout()">About Me</button>
+  <button class="btn-rating" onclick="alert('Ratings feature coming soon!')">Rating</button>
+  <button class="btn-projects" onclick="alert('Projects feature coming soon!')">Projects</button>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal" id="editModal">
+  <div class="modal-content">
+    <span class="close" onclick="closeEditModal()">×</span>
+    <h3>Edit Account</h3>
+    <label>Name</label>
+    <input type="text" id="editName">
+    <label>Local Skill</label>
+    <select id="editSkill">
+      <option value="">Select Skill</option>
+      <option value="Plumbing">Plumbing</option>
+      <option value="Carpentry">Carpentry</option>
+      <option value="Electrician">Electrician</option>
+      <option value="Haircutting">Haircutting</option>
+      <option value="Cooking">Cooking</option>
+      <option value="Gardening">Gardening</option>
+      <option value="Cleaning">Cleaning</option>
+    </select>
+    <label>Location</label>
+    <input type="text" id="editLocation" readonly>
+    <button onclick="updateAccount()">Update</button>
+  </div>
+</div>
+
+<script>
+let currentUser = JSON.parse(localStorage.getItem('currentFreelancer'));
+if(!currentUser){ alert('No user logged in'); window.location.href='freelancer.html'; }
+
+document.getElementById('welcome').innerText = 'Welcome, '+currentUser.name.split(' ')[0];
+document.getElementById('profileImage').src = currentUser.image || 'https://via.placeholder.com/100';
+document.getElementById('fullName').innerText = currentUser.name;
+document.getElementById('email').innerText = currentUser.email;
+document.getElementById('phone').innerText = currentUser.phone;
+document.getElementById('skill').innerText = currentUser.skill;
+document.getElementById('location').innerText = currentUser.location;
+
+// ===== Delete Account =====
+function deleteAccount(){
+  if(confirm('Are you sure you want to delete your account?')){
+    const users = JSON.parse(localStorage.getItem('freelancers') || '[]');
+    const filtered = users.filter(u => u.email !== currentUser.email);
+    localStorage.setItem('freelancers', JSON.stringify(filtered));
+    localStorage.removeItem('currentFreelancer');
+    alert('Account deleted');
+    window.location.href='freelancer.html';
+  }
+}
+
+// ===== Edit Account Modal =====
+function openEditModal(){
+  document.getElementById('editModal').style.display='flex';
+  document.getElementById('editName').value = currentUser.name;
+  document.getElementById('editSkill').value = currentUser.skill;
+  document.getElementById('editLocation').value = currentUser.location;
+}
+function closeEditModal(){ document.getElementById('editModal').style.display='none'; }
+
+function updateAccount(){
+  const newName = document.getElementById('editName').value.trim();
+  const newSkill = document.getElementById('editSkill').value;
+  if(!newName || !newSkill){ alert('Fill all fields'); return; }
+
+  currentUser.name = newName;
+  currentUser.skill = newSkill;
+
+  // update localStorage
+  const users = JSON.parse(localStorage.getItem('freelancers') || '[]');
+  const idx = users.findIndex(u=>u.email===currentUser.email);
+  if(idx>=0){ users[idx] = currentUser; localStorage.setItem('freelancers', JSON.stringify(users)); }
+  localStorage.setItem('currentFreelancer', JSON.stringify(currentUser));
+  alert('Account updated');
+  closeEditModal();
+  location.reload();
+}
+
+// ===== About Me =====
+function goAbout(){ window.location.href='aboutme.html'; }
+</script>
+</body>
+</html>
