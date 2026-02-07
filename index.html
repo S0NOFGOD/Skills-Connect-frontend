@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillConnect — Connect Locals</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Reset & basic styles */
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Montserrat', sans-serif; }
+  body {
+    background: #0D1117;
+    color: #F0F6FC;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+    padding: 20px;
+  }
+
+  /* Container */
+  .container {
+    max-width: 400px;
+    width: 100%;
+    background: #161B22;
+    padding: 30px 20px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #58A6FF;
+  }
+
+  p {
+    font-size: 16px;
+    color: #C9D1D9;
+    margin-bottom: 30px;
+  }
+
+  /* Buttons */
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 14px 0;
+    margin: 10px 0;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-freelancer {
+    background: #238636;
+    color: #fff;
+  }
+  .btn-freelancer:hover {
+    background: #2ea043;
+  }
+
+  .btn-client {
+    background: #7950F2;
+    color: #fff;
+  }
+  .btn-client:hover {
+    background: #9160f7;
+  }
+
+  @media (max-width: 400px) {
+    .container { padding: 25px 15px; }
+    h1 { font-size: 24px; }
+    p { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Welcome to SkillConnect</h1>
+  <p>Connect with skilled professionals near you or showcase your skills to get hired. Join our community today and make your life easier!</p>
+  <button class="btn btn-freelancer" onclick="window.location.href='freelancer.html'">I'm a Freelancer</button>
+  <button class="btn btn-client" onclick="window.location.href='client.html'">I'm a Client</button>
+</div>
+</body>
+</html>
