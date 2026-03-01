@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Freelancer Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
+
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,#141e30,#243b55);
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.dashboard{
+  width:95%;
+  max-width:900px;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(20px);
+  border-radius:25px;
+  padding:40px;
+  box-shadow:0 30px 70px rgba(0,0,0,0.5);
+  animation:fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.profile{
+  display:flex;
+  align-items:center;
+  gap:30px;
+  margin-bottom:30px;
+}
+
+.profile img{
+  width:130px;
+  height:130px;
+  border-radius:50%;
+  object-fit:cover;
+  border:4px solid #00c6ff;
+}
+
+.profile-info h2{
+  font-size:26px;
+  margin-bottom:5px;
+}
+
+.badge{
+  display:inline-block;
+  padding:6px 14px;
+  border-radius:20px;
+  background:linear-gradient(135deg,#00c6ff,#0072ff);
+  font-size:13px;
+  font-weight:600;
+  margin-top:8px;
+}
+
+.info-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:20px;
+  margin-top:20px;
+}
+
+.card{
+  background:rgba(255,255,255,0.1);
+  padding:20px;
+  border-radius:18px;
+  transition:0.3s ease;
+}
+
+.card:hover{
+  transform:translateY(-5px);
+}
+
+.card h4{
+  font-size:14px;
+  opacity:0.7;
+  margin-bottom:8px;
+}
+
+.button-group{
+  display:flex;
+  gap:15px;
+  margin-top:30px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  padding:12px 20px;
+  border:none;
+  border-radius:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s ease;
+  min-width:140px;
+  text-align:center;
+}
+
+.btn-logout{
+  background:linear-gradient(135deg,#ff416c,#ff4b2b);
+  color:#fff;
+}
+
+.btn-about{
+  background:linear-gradient(135deg,#00c6ff,#0072ff);
+  color:#fff;
+}
+
+.btn-edit{
+  background:linear-gradient(135deg,#ffb347,#ffcc33);
+  color:#000;
+}
+
+.btn-delete{
+  background:linear-gradient(135deg,#ff4b2b,#ff416c);
+  color:#fff;
+}
+
+.btn:hover{
+  transform:scale(1.05);
+}
+
+/* Edit Profile Modal */
+.modal{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:100;
+}
+
+.modal-content{
+  background:rgba(255,255,255,0.1);
+  backdrop-filter:blur(15px);
+  padding:30px;
+  border-radius:20px;
+  width:90%;
+  max-width:500px;
+  text-align:left;
+  color:#fff;
+}
+
+.modal-content h3{
+  margin-bottom:20px;
+}
+
+.modal-content label{
+  display:block;
+  margin-bottom:5px;
+  font-size:14px;
+}
+
+.modal-content input{
+  width:100%;
+  padding:10px;
+  margin-bottom:15px;
+  border-radius:10px;
+  border:none;
+  outline:none;
+  font-size:14px;
+}
+
+.modal-content .update-btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(135deg,#00c6ff,#0072ff);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s ease;
+}
+
+.modal-content .update-btn:hover{
+  transform:scale(1.05);
+}
+
+.close-btn{
+  position:absolute;
+  top:15px;
+  right:20px;
+  font-size:20px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+  <div class="profile">
+    <img id="profile-image" src="" alt="Profile">
+    <div class="profile-info">
+      <h2 id="user-name"></h2>
+      <div class="badge" id="user-skill"></div>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="card">
+      <h4>Email</h4>
+      <p id="user-email"></p>
+    </div>
+    <div class="card">
+      <h4>Phone</h4>
+      <p id="user-phone"></p>
+    </div>
+    <div class="card">
+      <h4>Location</h4>
+      <p id="user-location"></p>
+    </div>
+  </div>
+
+  <div class="button-group">
+    <button class="btn btn-logout" onclick="logout()">Logout</button>
+    <button class="btn btn-about" onclick="window.location.href='aboutme.html'">About Me</button>
+    <button class="btn btn-edit" onclick="openEditModal()">Edit Profile</button>
+    <button class="btn btn-delete" onclick="deleteAccount()">Delete Account</button>
+  </div>
+
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal" id="editModal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeEditModal()">&times;</span>
+    <h3>Edit Profile</h3>
+    <label for="edit-name">Name</label>
+    <input type="text" id="edit-name">
+    <label for="edit-email">Email</label>
+    <input type="email" id="edit-email">
+    <label for="edit-phone">Phone</label>
+    <input type="text" id="edit-phone">
+    <label for="edit-location">Location</label>
+    <input type="text" id="edit-location">
+    <label for="edit-skill">Skill</label>
+    <input type="text" id="edit-skill">
+    <label for="edit-image">Profile Image URL</label>
+    <input type="text" id="edit-image">
+    <button class="update-btn" onclick="updateProfile()">Update</button>
+  </div>
+</div>
+
+<script>
+const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+if(!currentUser){
+  window.location.href = "index.html";
+}
+
+document.getElementById("user-name").innerText = currentUser.name;
+document.getElementById("user-email").innerText = currentUser.email;
+document.getElementById("user-phone").innerText = currentUser.phone;
+document.getElementById("user-location").innerText = currentUser.location;
+document.getElementById("user-skill").innerText = currentUser.skill;
+
+if(currentUser.image){
+  document.getElementById("profile-image").src = currentUser.image;
+}else{
+  document.getElementById("profile-image").src = "https://via.placeholder.com/150";
+}
+
+function logout(){
+  localStorage.removeItem("currentUser");
+  window.location.href = "index.html";
+}
+
+function deleteAccount(){
+  if(confirm("Are you sure you want to delete your account? This action cannot be undone.")){
+    localStorage.removeItem("currentUser");
+    window.location.href = "index.html";
+  }
+}
+
+// Edit Profile
+const modal = document.getElementById("editModal");
+
+function openEditModal(){
+  modal.style.display = "flex";
+  document.getElementById("edit-name").value = currentUser.name;
+  document.getElementById("edit-email").value = currentUser.email;
+  document.getElementById("edit-phone").value = currentUser.phone;
+  document.getElementById("edit-location").value = currentUser.location;
+  document.getElementById("edit-skill").value = currentUser.skill;
+  document.getElementById("edit-image").value = currentUser.image || "";
+}
+
+function closeEditModal(){
+  modal.style.display = "none";
+}
+
+function updateProfile(){
+  const updatedUser = {
+    name: document.getElementById("edit-name").value,
+    email: document.getElementById("edit-email").value,
+    phone: document.getElementById("edit-phone").value,
+    location: document.getElementById("edit-location").value,
+    skill: document.getElementById("edit-skill").value,
+    image: document.getElementById("edit-image").value
+  };
+  localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+  location.reload();
+}
+
+// Close modal on click outside
+window.onclick = function(event){
+  if(event.target == modal){
+    closeEditModal();
+  }
+}
+
+</script>
+
+</body>
+</html>
