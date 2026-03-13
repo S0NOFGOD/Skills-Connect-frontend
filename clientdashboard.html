@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Dashboard - SkillConnect</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Montserrat',sans-serif;min-height:100vh;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);color:#fff;display:flex;align-items:center;justify-content:center;}
+.container{width:95%;max-width:600px;background:rgba(255,255,255,0.08);backdrop-filter:blur(20px);border-radius:20px;padding:30px;box-shadow:0 25px 60px rgba(0,0,0,0.4);}
+input,select,button{width:100%;padding:12px;margin-bottom:15px;border-radius:12px;border:none;font-size:14px;}
+input,select{background:rgba(255,255,255,0.15);color:#fff;}
+button{background:linear-gradient(135deg,#00c6ff,#0072ff);color:#fff;font-weight:600;cursor:pointer;transition:0.3s ease;}
+button:hover{transform:scale(1.03);}
+.result{margin-top:20px;background:rgba(0,0,0,0.4);padding:15px;border-radius:12px;}
+</style>
+</head>
+<body>
+<div class="container">
+<h1 id="welcome-text">Welcome Client</h1>
+
+<label>Choose Skill:</label>
+<select id="skill">
+  <option value="">Select Skill</option>
+  <option>Barber</option>
+  <option>Phone Repairer</option>
+  <option>Electrician</option>
+  <option>Plumber</option>
+  <option>Web Developer</option>
+  <option>Cleaner</option>
+</select>
+
+<button id="get-location-btn">📍 Use My Current Location</button>
+<input type="text" id="location" placeholder="Your location" readonly>
+
+<button id="search-btn">Search Freelancers</button>
+
+<div id="results"></div>
+<button id="logout-btn" style="background:linear-gradient(135deg,#ff4b5c,#ff1e00);">Logout</button>
+</div>
+
+<script>
+// Load user
+let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+if(!currentUser){window.location.href='client.html';}
+document.getElementById('welcome-text').innerText=`Welcome, ${currentUser.name.split(' ')[0]}`;
+
+// Use location
+document.getElementById('get-location-btn').addEventListener('click',()=>{
+  const locInput=document.getElementById('location');
+  locInput.value='Loading...';
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(async pos=>{
+      const {latitude, longitude}=pos.coords;
+      try{
+        const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+        const data=await res.json();
+        const state = data.address.state || '';
+        const city = data.address.city || data.address.town || data.address.village || '';
+        locInput.value = city && state ? `${city}, ${state}` : 'Location found';
+      }catch(e){ locInput.value='Failed to get location'; }
+    },()=>{locInput.value='Permission denied';});
+  }
+});
+
+// Search freelancers
+document.getElementById('search-btn').addEventListener('click',()=>{
+  const skill = document.getElementById('skill').value;
+  const location = document.getElementById('location').value;
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.innerHTML='';
+
+  if(!skill || !location){ return alert("Select skill and provide location!"); }
+
+  const users = JSON.parse(localStorage.getItem("users")) || [];
+  const filtered = users.filter(u=>u.skill===skill && u.location===location);
+
+  if(filtered.length===0){ resultsDiv.innerHTML='<p>No freelancers found.</p>'; return; }
+
+  filtered.forEach(u=>{
+    const div = document.createElement('div');
+    div.classList.add('result');
+    div.innerHTML=`
+      <p><strong>${u.name}</strong></p>
+      <p>Phone: ${u.phone}</p>
+      ${u.image?`<img src="${u.image}" width="100" />`:""}
+    `;
+    resultsDiv.appendChild(div);
+  });
+});
+
+// Logout
+document.getElementById('logout-btn').addEventListener('click',()=>{
+  localStorage.removeItem('currentUser');
+  window.location.href='client.html';
+});
+</script>
+</body>
+</html>
