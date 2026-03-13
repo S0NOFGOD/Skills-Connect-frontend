@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillConnect — Client Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #fff;
+  }
+
+  .dashboard-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    position: relative;
+  }
+
+  .about-btn-container {
+    text-align: right;
+    margin-bottom: 20px;
+  }
+
+  #about-btn {
+    background: linear-gradient(135deg,#33ccff,#0066ff);
+    color: #fff;
+    padding: 12px 25px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .search-card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    margin-bottom: 30px;
+  }
+
+  .search-card input, .search-card select, .search-card button {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+  }
+
+  .search-card select {
+    background: rgba(255,255,255,0.15);
+    color: #000;
+  }
+
+  .search-card input {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+  }
+
+  .search-card button {
+    background: linear-gradient(135deg,#00c6ff,#0072ff);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+
+  .search-card button:hover {
+    transform: scale(1.03);
+  }
+
+  #results {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .result-card {
+    background: rgba(0,0,0,0.4);
+    padding: 20px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    transition: 0.3s;
+  }
+
+  .result-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+  }
+
+  @media(max-width:600px){
+    .search-card input, .search-card select, .search-card button{padding:12px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+
+  <div class="about-btn-container">
+    <button id="about-btn" onclick="window.location.href='aboutMe.html'">About Me</button>
+  </div>
+
+  <div class="search-card">
+    <h2>Search for Freelancers</h2>
+    <select id="skill-select">
+      <option value="">Select Skill</option>
+      <option>Barber</option>
+      <option>Phone Repairer</option>
+      <option>Electrician</option>
+      <option>Plumber</option>
+      <option>Web Developer</option>
+      <option>Cleaner</option>
+    </select>
+
+    <input type="text" id="client-location" placeholder="Your Location" readonly />
+    <button id="get-location-btn">Use My Current Location</button>
+    <button id="search-btn">Search</button>
+
+    <div id="results"></div>
+  </div>
+
+</div>
+
+<script>
+// Load users
+let users = JSON.parse(localStorage.getItem('users')) || [];
+let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+if(!currentUser){ window.location.href='client.html'; }
+
+// Location finder
+document.getElementById('get-location-btn').addEventListener('click', ()=>{
+    const locInput = document.getElementById('client-location');
+    locInput.value = 'Fetching location...';
+    if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(async (pos)=>{
+            const { latitude, longitude } = pos.coords;
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                const data = await res.json();
+                const state = data.address.state || '';
+                const country = data.address.country || '';
+                locInput.value = state && country ? `${state}, ${country}` : 'Location not found';
+            } catch(e){ locInput.value='Unable to fetch location'; }
+        }, ()=>{ locInput.value='Permission denied'; });
+    } else { locInput.value='Geolocation not supported'; }
+});
+
+// Search freelancers
+document.getElementById('search-btn').addEventListener('click', ()=>{
+    const skill = document.getElementById('skill-select').value;
+    const location = document.getElementById('client-location').value.trim();
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '';
+
+    if(!skill || !location){ alert('Please select skill and location'); return; }
+
+    const matched = users.filter(u => u.skill === skill && u.location && u.location.includes(location));
+    if(matched.length===0){ resultsDiv.innerHTML='<p>No freelancers found.</p>'; return; }
+
+    matched.forEach(f=>{
+        const card = document.createElement('div');
+        card.className = 'result-card';
+        card.innerHTML = `
+          <strong>${f.name}</strong>
+          <span>Skill: ${f.skill}</span>
+          <span>Email: ${f.email}</span>
+          <span>Phone: ${f.phone}</span>
+        `;
+        resultsDiv.appendChild(card);
+    });
+});
+</script>
+
+</body>
+</html>
