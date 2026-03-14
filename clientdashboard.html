@@ -1,0 +1,243 @@
+<!DOCTYPE html>    
+<html lang="en">    
+<head>    
+<meta charset="UTF-8" />    
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>    
+<title>SkillConnect — Client Dashboard</title>    
+    
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">    
+    
+<style>    
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}    
+body{    
+  min-height:100vh;    
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);    
+  color:#fff;    
+  display:flex;    
+  justify-content:center;    
+  padding:20px;    
+}    
+.dashboard-container{    
+  width:100%;    
+  max-width:500px;    
+  background:rgba(255,255,255,0.08);    
+  backdrop-filter:blur(20px);    
+  border-radius:20px;    
+  padding:30px;    
+  box-shadow:0 25px 60px rgba(0,0,0,0.4);    
+  animation:fadeIn 1s ease;    
+}    
+    
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}    
+    
+.button-group{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px;}    
+button{padding:12px 20px;border:none;border-radius:12px;font-weight:600;cursor:pointer;transition:0.3s ease;}    
+button:hover{transform:scale(1.03);}    
+.about-btn{background:linear-gradient(135deg,#00c6ff,#0072ff);color:#fff;}    
+.edit-btn{background:linear-gradient(135deg,#ffa500,#ff6600);color:#fff;}    
+.logout-btn{background:linear-gradient(135deg,#ff4b5c,#ff6a95);color:#fff;}    
+.delete-btn{background:linear-gradient(135deg,#ff0000,#aa0000);color:#fff;}    
+    
+.edit-form{display:none;flex-direction:column;margin-top:20px;}    
+.edit-form input{width:100%;padding:12px;margin-bottom:12px;border-radius:12px;border:none;outline:none;font-size:14px;background:rgba(255,255,255,0.15);color:#fff;}    
+.edit-form button{width:100%;}    
+    
+.search-form{margin-top:20px;display:flex;flex-direction:column;}    
+.search-form input, .search-form select{    
+  width:100%;    
+  padding:12px;    
+  margin-bottom:12px;    
+  border-radius:12px;    
+  border:none;    
+  outline:none;    
+  font-size:14px;    
+  background:rgba(255,255,255,0.15);    
+  color:#fff;    
+}    
+.search-form button{    
+  width:100%;    
+  background:linear-gradient(135deg,#00c6ff,#0072ff);    
+  color:#fff;    
+  font-weight:600;    
+  cursor:pointer;    
+}    
+
+/* Added extra space between the last two buttons */
+#search-location + #get-location-btn {
+  margin-bottom:8px; /* small extra space */
+}
+
+.results{margin-top:20px;}    
+.result-card{    
+  background:rgba(255,255,255,0.08);    
+  padding:15px;    
+  border-radius:12px;    
+  margin-bottom:12px;    
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);    
+}    
+.result-card p{margin-bottom:6px;font-size:14px;}    
+.error{color:#ff4b5c;font-size:12px;margin-bottom:10px;}    
+</style>    
+</head>    
+<body>    
+    
+<div class="dashboard-container">    
+    
+  <div class="button-group">    
+    <button class="about-btn" id="about-btn">About Me</button>    
+    <button class="edit-btn" id="edit-btn">Edit Info</button>    
+    <button class="logout-btn" id="logout-btn">Log Out</button>    
+    <button class="delete-btn" id="delete-btn">Delete Account</button>    
+  </div>    
+    
+  <!-- Edit Form -->    
+  <div class="edit-form" id="edit-form">    
+    <div class="error" id="edit-error"></div>    
+    <input type="text" id="edit-name" placeholder="Full Name">    
+    <input type="email" id="edit-email" placeholder="Email">    
+    <button id="save-btn">Save Changes</button>    
+  </div>    
+    
+  <!-- Search Freelancers -->    
+  <div class="search-form">    
+    <div class="error" id="search-error"></div>    
+    <select id="search-skill">    
+      <option value="">Select Skill</option>    
+      <option>Barber</option>    
+      <option>Phone Repairer</option>    
+      <option>Electrician</option>    
+      <option>Plumber</option>    
+      <option>Web Developer</option>    
+      <option>Cleaner</option>    
+    </select>    
+    <input type="text" id="search-location" placeholder="Enter location manually">    
+    <button id="get-location-btn">Use My Current Location</button>    
+    <button id="search-btn">Search Freelancers</button>    
+  </div>    
+    
+  <div class="results" id="results"></div>    
+</div>    
+    
+<script>    
+// ----------------------------    
+// Helper functions    
+// ----------------------------    
+function getClients(){ return JSON.parse(localStorage.getItem("clients")) || []; }    
+function saveClients(clients){ localStorage.setItem("clients", JSON.stringify(clients)); }    
+function getUsers(){ return JSON.parse(localStorage.getItem("users")) || []; }    
+function validateEmail(email){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }    
+    
+// Load current client    
+let currentClient = JSON.parse(localStorage.getItem("currentClient"));    
+if(!currentClient) window.location.href = "client.html";    
+    
+// About Me button    
+document.getElementById('about-btn').addEventListener('click', ()=>{    
+  window.location.href = "aboutme.html";    
+});    
+    
+// Logout    
+document.getElementById('logout-btn').addEventListener('click', ()=>{    
+  localStorage.removeItem("currentClient");    
+  window.location.href = "client.html";    
+});    
+    
+// Delete account    
+document.getElementById('delete-btn').addEventListener('click', ()=>{    
+  if(confirm("Are you sure you want to delete your account?")){    
+    let clients = getClients();    
+    clients = clients.filter(c => c.email !== currentClient.email);    
+    saveClients(clients);    
+    localStorage.removeItem("currentClient");    
+    window.location.href = "client.html";    
+  }    
+});    
+    
+// Edit Info toggle    
+const editForm = document.getElementById('edit-form');    
+document.getElementById('edit-btn').addEventListener('click', ()=>{    
+  editForm.style.display = editForm.style.display === "flex" ? "none" : "flex";    
+  if(editForm.style.display==="flex"){    
+    document.getElementById('edit-name').value = currentClient.name;    
+    document.getElementById('edit-email').value = currentClient.email;    
+  }    
+});    
+    
+// Save changes    
+document.getElementById('save-btn').addEventListener('click', ()=>{    
+  const name = document.getElementById('edit-name').value.trim();    
+  const email = document.getElementById('edit-email').value.trim();    
+  const error = document.getElementById('edit-error'); error.innerText="";    
+    
+  if(!name||!email){ error.innerText="All fields are required!"; return; }    
+  if(!validateEmail(email)){ error.innerText="Invalid email format!"; return; }    
+    
+  let clients = getClients();    
+  if(clients.find(c=>c.email===email && c.email!==currentClient.email)){ error.innerText="Email already in use!"; return; }    
+    
+  currentClient.name = name;    
+  currentClient.email = email;    
+  clients = clients.map(c=>c.email===currentClient.email?currentClient:c);    
+  saveClients(clients);    
+  localStorage.setItem("currentClient", JSON.stringify(currentClient));    
+  editForm.style.display="none";    
+  alert("Profile updated successfully!");    
+});    
+    
+// ----------------------------    
+// Geolocation    
+// ----------------------------    
+document.getElementById('get-location-btn').addEventListener('click', ()=> {    
+  const locInput = document.getElementById('search-location');    
+  locInput.value = 'Fetching...';    
+  if(navigator.geolocation){    
+    navigator.geolocation.getCurrentPosition(async (position)=>{    
+      const { latitude, longitude } = position.coords;    
+      try{    
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);    
+        const data = await response.json();    
+        const city = data.address.city || data.address.town || data.address.village || '';    
+        const state = data.address.state || '';    
+        locInput.value = city && state ? `${city}, ${state}` : 'Location not found';    
+      }catch(e){    
+        locInput.value = 'Unable to fetch location';    
+      }    
+    }, ()=> { locInput.value = 'Permission denied'; });    
+  } else { locInput.value = 'Geolocation not supported'; }    
+});    
+    
+// ----------------------------    
+// Search Freelancers    
+// ----------------------------    
+document.getElementById('search-btn').addEventListener('click', ()=>{    
+  const skill = document.getElementById('search-skill').value;    
+  const location = document.getElementById('search-location').value.trim().toLowerCase();    
+  const resultsDiv = document.getElementById('results');    
+  const errorDiv = document.getElementById('search-error');    
+  resultsDiv.innerHTML = '';    
+  errorDiv.innerText='';    
+    
+  if(!skill && !location){ errorDiv.innerText="Select skill or enter location!"; return; }    
+    
+  const users = getUsers();    
+  let filtered = users;    
+    
+  if(skill) filtered = filtered.filter(u=>u.skill===skill);    
+  if(location) filtered = filtered.filter(u=>u.location && u.location.toLowerCase().includes(location));    
+    
+  if(filtered.length===0){ resultsDiv.innerHTML='<p>No freelancers found.</p>'; return; }    
+    
+  filtered.forEach(u=>{    
+    const card = document.createElement('div');    
+    card.classList.add('result-card');    
+    card.innerHTML = `<p><strong>Name:</strong> ${u.name}</p>    
+                      <p><strong>Skill:</strong> ${u.skill}</p>    
+                      <p><strong>Email:</strong> ${u.email}</p>    
+                      <p><strong>Phone:</strong> ${u.phone}</p>`;    
+    resultsDiv.appendChild(card);    
+  });    
+});    
+</script>    
+    
+</body>    
+</html>
