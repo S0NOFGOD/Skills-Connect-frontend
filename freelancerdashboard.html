@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Freelancer Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
+
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  padding:20px;
+}
+
+.container{
+  width:100%;
+  max-width:400px;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(20px);
+  border-radius:20px;
+  padding:25px;
+  text-align:center;
+}
+
+img{
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  object-fit:cover;
+  margin-bottom:15px;
+}
+
+h2{margin-bottom:5px;}
+p{opacity:0.8;margin-bottom:10px;font-size:14px;}
+
+.button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.edit{background:linear-gradient(135deg,#00c6ff,#0072ff);}
+.delete{background:linear-gradient(135deg,#ff4b5c,#ff0000);}
+
+.message{
+  margin-top:25px;
+  font-size:14px;
+  opacity:0.9;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <img id="profile-img" src="" alt="Profile">
+
+  <h2 id="name"></h2>
+  <p id="email"></p>
+  <p id="phone"></p>
+  <p id="location"></p>
+  <p id="skill"></p>
+
+  <button class="button edit" onclick="editProfile()">Edit Profile</button>
+  <button class="button delete" onclick="deleteAccount()">Delete Account</button>
+
+  <div class="message">
+    🎉 Congratulations, local clients will start contacting you
+  </div>
+</div>
+
+<script>
+const user = JSON.parse(localStorage.getItem("currentUser"));
+
+if(!user){
+  window.location.href = "freelancer.html";
+}
+
+// Display data
+document.getElementById("name").innerText = user.name;
+document.getElementById("email").innerText = user.email;
+document.getElementById("phone").innerText = user.phone;
+document.getElementById("location").innerText = user.location;
+document.getElementById("skill").innerText = user.skill;
+
+if(user.image){
+  document.getElementById("profile-img").src = user.image;
+}else{
+  document.getElementById("profile-img").src = "https://via.placeholder.com/90";
+}
+
+// Edit (simple version)
+function editProfile(){
+  const newName = prompt("Enter new name:", user.name);
+  if(newName){
+    user.name = newName;
+
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+    users = users.map(u => u.email === user.email ? user : u);
+
+    localStorage.setItem("users", JSON.stringify(users));
+    localStorage.setItem("currentUser", JSON.stringify(user));
+
+    location.reload();
+  }
+}
+
+// Delete
+function deleteAccount(){
+  if(confirm("Are you sure you want to delete your account?")){
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+    users = users.filter(u => u.email !== user.email);
+
+    localStorage.setItem("users", JSON.stringify(users));
+    localStorage.removeItem("currentUser");
+
+    window.location.href = "index.html";
+  }
+}
+</script>
+
+</body>
+</html>
