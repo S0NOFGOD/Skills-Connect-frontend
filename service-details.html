@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SkillConnect — Service Details</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Montserrat',sans-serif;
+}
+
+/* GLOBAL BACKGROUND */
+body {
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:#fff;
+  padding:20px;
+}
+
+/* GLASS CARD */
+.details-container {
+  width:100%;
+  max-width:500px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(25px);
+  border-radius:20px;
+  padding:40px 25px;
+  box-shadow:0 20px 50px rgba(0,0,0,0.4);
+  border:1px solid rgba(255,255,255,0.1);
+  text-align:center;
+  margin-top:30px;
+  animation:fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+  from {opacity:0; transform:translateY(20px);}
+  to {opacity:1; transform:translateY(0);}
+}
+
+/* HEADINGS */
+.details-container h1 {
+  font-size:1.8rem;
+  margin-bottom:20px;
+  font-weight:700;
+}
+
+.details-container p {
+  font-size:0.95rem;
+  opacity:0.85;
+  margin-bottom:30px;
+  line-height:1.5;
+}
+
+/* BACK BUTTON */
+.back-btn {
+  display:inline-block;
+  margin-top:20px;
+  padding:12px 25px;
+  border-radius:12px;
+  background: linear-gradient(135deg,#ffa500,#ff6600);
+  color:#fff;
+  text-decoration:none;
+  font-weight:600;
+  transition:0.3s ease, box-shadow 0.3s ease;
+}
+
+.back-btn:hover {
+  transform:translateY(-2px) scale(1.03);
+  box-shadow:0 12px 25px rgba(0,0,0,0.45);
+}
+</style>
+</head>
+<body>
+
+<div class="details-container">
+  <h1 id="serviceTitle">Service Title</h1>
+  <p id="serviceDesc">Service Description</p>
+
+  <a href="client.html" class="back-btn">← Back to Client Dashboard</a>
+</div>
+
+<script>
+// Get service index from URL
+const params = new URLSearchParams(window.location.search);
+const index = params.get('index');
+
+// Load services from localStorage
+let services = JSON.parse(localStorage.getItem('services')) || [];
+const titleEl = document.getElementById('serviceTitle');
+const descEl = document.getElementById('serviceDesc');
+
+if(services[index]){
+  titleEl.textContent = services[index].title;
+  descEl.textContent = services[index].desc;
+}else{
+  titleEl.textContent = "Service Not Found";
+  descEl.textContent = "The requested service does not exist.";
+}
+</script>
+
+</body>
+</html>
