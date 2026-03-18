@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SkillConnect — Freelancer Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
+body{min-height:100vh;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);color:#fff;display:flex;align-items:center;justify-content:center;padding:20px;}
+.container{width:100%;max-width:600px;background: rgba(255,255,255,0.08);backdrop-filter: blur(25px);border-radius:25px;padding:40px 30px;box-shadow: 0 25px 60px rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.15);}
+h1{text-align:center;font-weight:700;margin-bottom:20px;}
+.profile{display:flex;flex-direction:column;align-items:center;}
+.profile img{width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:20px;border:2px solid #fff;}
+.profile input, .profile textarea, .profile select{width:80%;padding:10px;margin:5px 0;border-radius:10px;border:none;outline:none;font-size:14px;}
+.profile textarea{resize:none;height:60px;}
+button{padding:12px 25px;margin-top:15px;border:none;border-radius:12px;background:linear-gradient(135deg,#00c6ff,#0072ff);color:#fff;font-weight:600;cursor:pointer;transition:0.3s ease;}
+button:hover{transform:scale(1.05);}
+.save-btn{background:linear-gradient(135deg,#28a745,#218838);}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Freelancer Dashboard</h1>
+  <div class="profile">
+    <img id="profile-image" src="" alt="Profile Image"/>
+    
+    <input type="text" id="profile-name" placeholder="Name"/>
+    <input type="email" id="profile-email" placeholder="Email" disabled/>
+    <input type="text" id="profile-phone" placeholder="Phone"/>
+    <input type="text" id="profile-location" placeholder="Location"/>
+    <select id="profile-skill">
+      <option value="">Select Skill</option>
+      <option>Barber</option>
+      <option>Phone Repairer</option>
+      <option>Electrician</option>
+      <option>Plumber</option>
+      <option>Web Developer</option>
+      <option>Cleaner</option>
+    </select>
+    <textarea id="profile-description" placeholder="Describe your service..."></textarea>
+    <input type="file" id="profile-image-upload" accept="image/*"/>
+    
+    <button id="save-btn" class="save-btn">Save Changes</button>
+    <button id="logout-btn">Logout</button>
+  </div>
+</div>
+
+<script>
+// GET LOGGED-IN USER
+let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+if(!currentUser){ window.location.href="freelancer.html"; }
+
+// Populate profile fields
+document.getElementById("profile-name").value = currentUser.name;
+document.getElementById("profile-email").value = currentUser.email;
+document.getElementById("profile-phone").value = currentUser.phone;
+document.getElementById("profile-location").value = currentUser.location;
+document.getElementById("profile-skill").value = currentUser.skill;
+document.getElementById("profile-description").value = currentUser.description;
+document.getElementById("profile-image").src = currentUser.image || "https://via.placeholder.com/120";
+
+// IMAGE UPLOAD
+document.getElementById("profile-image-upload").addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = ()=> { 
+      currentUser.image = reader.result; 
+      document.getElementById("profile-image").src = currentUser.image;
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// SAVE CHANGES
+document.getElementById("save-btn").onclick = ()=>{
+  currentUser.name = document.getElementById("profile-name").value.trim();
+  currentUser.phone = document.getElementById("profile-phone").value.trim();
+  currentUser.location = document.getElementById("profile-location").value.trim();
+  currentUser.skill = document.getElementById("profile-skill").value;
+  currentUser.description = document.getElementById("profile-description").value.trim();
+
+  // Update in LocalStorage
+  let users = JSON.parse(localStorage.getItem("users")) || [];
+  const index = users.findIndex(u=>u.email===currentUser.email);
+  if(index!==-1){ users[index] = currentUser; }
+  localStorage.setItem("users", JSON.stringify(users));
+  localStorage.setItem("currentUser", JSON.stringify(currentUser));
+  alert("Profile updated successfully!");
+};
+
+// LOGOUT
+document.getElementById("logout-btn").onclick = ()=>{
+  localStorage.removeItem("currentUser");
+  window.location.href="freelancer.html";
+};
+</script>
+
+</body>
+</html>
