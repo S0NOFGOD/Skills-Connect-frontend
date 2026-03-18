@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SkillConnect — Freelancer Login/Signup</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Montserrat',sans-serif;
+}
+
+body {
+  min-height:100vh;
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  padding:20px;
+}
+
+/* CONTAINER CARD */
+.container{
+  width:100%;
+  max-width:500px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(25px);
+  border-radius:25px;
+  padding:40px 30px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+  border:1px solid rgba(255,255,255,0.15);
+  animation: fadeIn 1s ease;
+}
+
+/* ANIMATION */
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+/* HEADINGS */
+h1{text-align:center;font-weight:700;margin-bottom:15px;}
+p{text-align:center;font-size:14px;opacity:0.85;margin-bottom:25px;}
+
+/* INPUTS */
+input,select,textarea,button{
+  width:100%;
+  padding:14px;
+  margin-bottom:15px;
+  border-radius:12px;
+  border:none;
+  outline:none;
+  font-size:14px;
+}
+
+/* INPUT FIELDS */
+input,select,textarea{
+  background: rgba(255,255,255,0.15);
+  color:#fff;
+}
+
+/* TEXTAREA */
+textarea{resize:none;height:90px;}
+
+/* SELECT OPTIONS */
+select option{color:#000;}
+
+/* BUTTONS */
+button{
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s ease;
+  border:none;
+  border-radius:12px;
+}
+
+button:hover{ transform: scale(1.03); }
+
+/* MAIN BUTTON GRADIENTS */
+#login-btn, #signup-btn{
+  background:linear-gradient(135deg,#00c6ff,#0072ff);
+  color:#fff;
+}
+
+#forgot-btn{
+  background:linear-gradient(135deg,#ff6a00,#ee0979);
+  color:#fff;
+}
+
+#get-location-btn{
+  background:linear-gradient(135deg,#ffb347,#ffcc33);
+  color:#000;
+}
+
+/* TABS */
+.tabs{display:flex;justify-content:space-around;margin-bottom:20px;}
+.tab{
+  padding:10px 20px;
+  cursor:pointer;
+  border-radius:12px;
+  transition:0.3s ease;
+}
+.tab.active{
+  background:linear-gradient(135deg,#00c6ff,#0072ff);
+  font-weight:700;
+}
+
+/* FORM SECTIONS */
+.form-section{display:none;flex-direction:column;}
+.form-section.active{display:flex;}
+
+/* ERRORS */
+.error{color:#ff4b5c;font-size:12px;margin-bottom:10px;}
+
+/* PASSWORD TOGGLE */
+.password-wrapper{position:relative;width:100%;}
+.password-wrapper input{padding-right:40px;}
+.password-wrapper .toggle-password{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  cursor:pointer;
+  font-size:18px;
+  color:#fff;
+  opacity:0.7;
+  user-select:none;
+}
+.password-wrapper .toggle-password:hover{opacity:1;}
+
+/* FORGOT PASSWORD MODAL */
+#forgot-modal{
+  position:fixed;
+  top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+}
+#forgot-modal .modal-content{
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(25px);
+  padding:30px;
+  border-radius:20px;
+  width:90%;
+  max-width:400px;
+  text-align:center;
+  color:#fff;
+}
+#forgot-modal input{
+  margin-bottom:20px;
+}
+#forgot-modal button{
+  width:48%;
+  margin:0 1%;
+}
+#forgot-modal .close{
+  position:absolute;
+  top:15px;
+  right:20px;
+  font-size:20px;
+  cursor:pointer;
+  font-weight:bold;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>SkillConnect Freelancer</h1>
+  <p>Sign up or log in to find clients near you</p>
+
+  <div class="tabs">
+    <div class="tab active" id="login-tab">Login</div>
+    <div class="tab" id="signup-tab">Signup</div>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="form-section active" id="login">
+    <div class="error" id="login-error"></div>
+    <input type="email" id="login-email" placeholder="Email" />
+    <div class="password-wrapper">
+      <input type="password" id="login-password" placeholder="Password" />
+      <span class="toggle-password" data-target="login-password">👁️</span>
+    </div>
+    <button id="login-btn">Login</button>
+    <button id="forgot-btn">Forgot Password?</button>
+  </div>
+
+  <!-- SIGNUP -->
+  <div class="form-section" id="signup">
+    <div class="error" id="signup-error"></div>
+
+    <input type="text" id="signup-name" placeholder="Full Name" />
+    <input type="email" id="signup-email" placeholder="Email" />
+    <input type="text" id="signup-phone" placeholder="Phone Number" />
+
+    <button type="button" id="get-location-btn">Use My Current Location</button>
+    <input type="text" id="signup-location" placeholder="Location" readonly />
+
+    <select id="signup-skill">
+      <option value="">Select Skill</option>
+      <option>Barber</option>
+      <option>Phone Repairer</option>
+      <option>Electrician</option>
+      <option>Plumber</option>
+      <option>Web Developer</option>
+      <option>Cleaner</option>
+    </select>
+
+    <textarea id="signup-description" placeholder="Describe your service..."></textarea>
+
+    <div class="password-wrapper">
+      <input type="password" id="signup-password" placeholder="Password" />
+      <span class="toggle-password" data-target="signup-password">👁️</span>
+    </div>
+
+    <div class="password-wrapper">
+      <input type="password" id="signup-confirm-password" placeholder="Confirm Password" />
+      <span class="toggle-password" data-target="signup-confirm-password">👁️</span>
+    </div>
+
+    <input type="file" id="signup-image" accept="image/*" />
+
+    <button id="signup-btn">Signup</button>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div id="forgot-modal">
+  <div class="modal-content">
+    <span class="close" id="close-forgot">&times;</span>
+    <h2>Forgot Password</h2>
+    <p>Enter your registered email to view your password</p>
+    <input type="email" id="forgot-email" placeholder="Your email" />
+    <div id="forgot-error" class="error"></div>
+    <div style="display:flex; justify-content:space-between;">
+      <button id="forgot-cancel">Cancel</button>
+      <button id="forgot-submit">Submit</button>
+    </div>
+    <p id="forgot-result" style="margin-top:15px; color:#0f0;"></p>
+  </div>
+</div>
+
+<script>
+// PASSWORD TOGGLE
+document.addEventListener('click', e => {
+  if(e.target.classList.contains('toggle-password')){
+    const input = document.getElementById(e.target.dataset.target);
+    input.type = input.type==='password'?'text':'password';
+  }
+});
+
+// TABS SWITCH
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.form-section').forEach(f=>f.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  document.getElementById(tab+'-tab').classList.add('active');
+}
+document.getElementById('login-tab').onclick=()=>switchTab('login');
+document.getElementById('signup-tab').onclick=()=>switchTab('signup');
+
+// LOCAL STORAGE UTILS
+function getUsers(){ return JSON.parse(localStorage.getItem("users")) || []; }
+function saveUsers(users){ localStorage.setItem("users", JSON.stringify(users)); }
+function validateEmail(email){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+function validatePhone(phone){ return /^[0-9]{10,15}$/.test(phone); }
+
+// USE CURRENT LOCATION
+document.getElementById("get-location-btn").onclick = () => {
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos=>{
+      document.getElementById("signup-location").value = `Lat:${pos.coords.latitude.toFixed(2)}, Lon:${pos.coords.longitude.toFixed(2)}`;
+    }, ()=> alert("Could not get location"));
+  } else alert("Geolocation not supported");
+};
+
+// SIGNUP LOGIC
+document.getElementById('signup-btn').onclick=()=>{
+  const name = document.getElementById("signup-name").value.trim();
+  const email = document.getElementById("signup-email").value.trim();
+  const phone = document.getElementById("signup-phone").value.trim();
+  const location = document.getElementById("signup-location").value.trim();
+  const skill = document.getElementById("signup-skill").value;
+  const description = document.getElementById("signup-description").value.trim();
+  const password = document.getElementById("signup-password").value;
+  const confirmPassword = document.getElementById("signup-confirm-password").value;
+  const imageFile = document.getElementById("signup-image").files[0];
+  const error = document.getElementById("signup-error");
+  error.innerText='';
+
+  if(!name||!email||!phone||!skill||!description||!password||!confirmPassword){
+    error.innerText="Please fill all required fields!";
+    return;
+  }
+  if(!validateEmail(email)){ error.innerText="Invalid email"; return; }
+  if(!validatePhone(phone)){ error.innerText="Invalid phone"; return; }
+  if(password.length<6){ error.innerText="Password too short"; return; }
+  if(password!==confirmPassword){ error.innerText="Passwords do not match"; return; }
+
+  let users = getUsers();
+  if(users.find(u=>u.email===email)){ error.innerText="Email already exists"; return; }
+
+  let imageData=null;
+  function save(){
+    const newUser = {name,email,phone,location,skill,description,password,image:imageData};
+    users.push(newUser);
+    saveUsers(users);
+    localStorage.setItem("currentUser", JSON.stringify(newUser));
+    window.location.href="freelancerdashboard.html";
+  }
+
+  if(imageFile){
+    let reader = new FileReader();
+    reader.onload=()=>{ imageData=reader.result; save(); }
+    reader.readAsDataURL(imageFile);
+  } else save();
+};
+
+// LOGIN LOGIC
+document.getElementById('login-btn').onclick=()=>{
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value.trim();
+  const error = document.getElementById("login-error");
+  error.innerText='';
+
+  const user = getUsers().find(u=>u.email===email && u.password===password);
+  if(!user){ error.innerText="Invalid email or password"; return; }
+
+  localStorage.setItem("currentUser", JSON.stringify(user));
+  window.location.href="freelancerdashboard.html";
+};
+
+// FORGOT PASSWORD MODAL LOGIC
+const forgotModal = document.getElementById("forgot-modal");
+document.getElementById("forgot-btn").onclick = ()=> forgotModal.style.display="flex";
+document.getElementById("close-forgot").onclick = ()=> forgotModal.style.display="none";
+document.getElementById("forgot-cancel").onclick = ()=> forgotModal.style.display="none";
+
+document.getElementById("forgot-submit").onclick = ()=>{
+  const email = document.getElementById("forgot-email").value.trim();
+  const errorEl = document.getElementById("forgot-error");
+  const resultEl = document.getElementById("forgot-result");
+  errorEl.innerText='';
+  resultEl.innerText='';
+
+  if(!email){ errorEl.innerText="Please enter your email"; return; }
+  if(!validateEmail(email)){ errorEl.innerText="Invalid email format"; return; }
+
+  const user = getUsers().find(u=>u.email===email);
+  if(!user){ errorEl.innerText="Email not found"; return; }
+
+  resultEl.innerText = `Your password is: ${user.password}`;
+};
+</script>
+
+</body>
+        </html>
