@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SkillConnect — Freelancer Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Montserrat',sans-serif;
+}
+
+/* GLOBAL BACKGROUND */
+body {
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:#fff;
+  padding:20px;
+}
+
+/* GLASS CARD */
+.dashboard-container {
+  width:100%;
+  max-width:500px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(25px);
+  border-radius:20px;
+  padding:40px 25px;
+  box-shadow:0 20px 50px rgba(0,0,0,0.4);
+  border:1px solid rgba(255,255,255,0.1);
+  text-align:center;
+  margin-top:30px;
+  animation:fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+  from {opacity:0; transform:translateY(20px);}
+  to {opacity:1; transform:translateY(0);}
+}
+
+/* HEADINGS */
+.dashboard-container h1 {
+  font-size:1.8rem;
+  margin-bottom:20px;
+  font-weight:700;
+}
+
+.dashboard-container p {
+  font-size:0.95rem;
+  opacity:0.85;
+  margin-bottom:30px;
+  line-height:1.5;
+}
+
+/* SERVICE FORM */
+.service-form {
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+  margin-bottom:30px;
+}
+
+.service-form input,
+.service-form textarea {
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  outline:none;
+  font-size:0.95rem;
+  background: rgba(255,255,255,0.1);
+  color:#fff;
+  backdrop-filter: blur(10px);
+}
+
+.service-form input::placeholder,
+.service-form textarea::placeholder {
+  color:rgba(255,255,255,0.6);
+}
+
+.service-form button {
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  background: linear-gradient(135deg,#00c6ff,#0072ff);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-form button:hover {
+  transform:translateY(-2px) scale(1.03);
+  box-shadow:0 12px 25px rgba(0,0,0,0.45);
+}
+
+/* SERVICES LIST */
+.services-list {
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+
+.service-card {
+  background: rgba(255,255,255,0.08);
+  padding:15px;
+  border-radius:15px;
+  border:1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  text-align:left;
+}
+
+.service-card h3 {
+  margin-bottom:5px;
+  font-size:1.1rem;
+  font-weight:600;
+}
+
+.service-card p {
+  font-size:0.9rem;
+  opacity:0.85;
+  line-height:1.3;
+}
+
+/* BACK BUTTON */
+.back-btn {
+  display:inline-block;
+  margin-top:20px;
+  padding:12px 25px;
+  border-radius:12px;
+  background: linear-gradient(135deg,#ffa500,#ff6600);
+  color:#fff;
+  text-decoration:none;
+  font-weight:600;
+  transition:0.3s ease, box-shadow 0.3s ease;
+}
+
+.back-btn:hover {
+  transform:translateY(-2px) scale(1.03);
+  box-shadow:0 12px 25px rgba(0,0,0,0.45);
+}
+</style>
+</head>
+<body>
+
+<div class="dashboard-container">
+  <h1>Freelancer Dashboard</h1>
+  <p>Add your services below to showcase your skills to local clients.</p>
+
+  <!-- SERVICE FORM -->
+  <form class="service-form" id="serviceForm">
+    <input type="text" id="serviceTitle" placeholder="Service Title" required/>
+    <textarea id="serviceDesc" placeholder="Brief Description" rows="3" required></textarea>
+    <button type="submit">Add Service</button>
+  </form>
+
+  <!-- SERVICES LIST -->
+  <div class="services-list" id="servicesList">
+    <!-- Service cards will appear here -->
+  </div>
+
+  <a href="index.html" class="back-btn">← Back to Home</a>
+</div>
+
+<script>
+// Local offline storage for services
+const serviceForm = document.getElementById('serviceForm');
+const servicesList = document.getElementById('servicesList');
+
+// Load services from localStorage
+let services = JSON.parse(localStorage.getItem('services')) || [];
+renderServices();
+
+serviceForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const title = document.getElementById('serviceTitle').value;
+  const desc = document.getElementById('serviceDesc').value;
+
+  const service = { title, desc };
+  services.push(service);
+  localStorage.setItem('services', JSON.stringify(services));
+  renderServices();
+  serviceForm.reset();
+});
+
+function renderServices() {
+  servicesList.innerHTML = '';
+  if(services.length === 0){
+    servicesList.innerHTML = '<p style="opacity:0.8;">No services added yet.</p>';
+    return;
+  }
+  services.forEach((service, index) => {
+    const card = document.createElement('div');
+    card.className = 'service-card';
+    card.innerHTML = `<h3>${service.title}</h3><p>${service.desc}</p>`;
+    servicesList.appendChild(card);
+  });
+}
+</script>
+
+</body>
+</html>
